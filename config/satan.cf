@@ -1,0 +1,132 @@
+#
+# Configuration file for satan; limits, policies, etc. go here
+#
+#
+# version 1, Mon Mar 20 19:16:55 1995, last mod by wietse
+#
+
+#
+# NOTE - "" or 0 means false, in this config file
+#
+
+# Where do we keep the data? This is just a default.
+$satan_data = "satan-data";
+
+# Default attack level (0=light, 1=normal, 2=heavy).
+$attack_level = 0;
+
+# Probes by attack level.
+#
+# ? Means conditional, proposed by rules.todo.
+# With heavy scans, replace 1-9999 by 1-65535 to find all non-standard
+# telnet, ftp, www or gopher servers.
+
+@light = (
+	'dns.satan',
+	'rpc.satan',
+	'showmount.satan?',
+	);
+
+@normal = (
+	@light, 
+	'finger.satan', 
+	'tcpscan.satan 70,80,ftp,telnet,smtp,nntp,uucp,6000', 
+	'udpscan.satan 53,177',
+	'rusers.satan?', 
+	'boot.satan?',
+	'yp-chk.satan?',
+	);
+
+@heavy = (
+	@normal,
+	$heavy_tcp_scan = 'tcpscan.satan 1-9999',
+	$heavy_udp_scan = 'udpscan.satan 1-2050,32767-33500',
+	'*?',
+	);
+
+# status file; keeps track of what SATAN is doing.
+$status_file = "status_file";
+
+#
+# timeout values. -t option chooses one of these.
+#
+$short_timeout = 10;
+$med_timeout = 20;
+$long_timeout = 60;
+
+#
+# Some tools need more time, as specified in the timeouts array.
+#
+%timeouts = (
+	'nfs-chk.satan', 120,
+	$heavy_tcp_scan, 120,
+	$heavy_udp_scan, 120,
+	);
+
+# what signal we send to nuke things when they timeout:
+$timeout_kill = 9;
+
+#
+# Proximity variables; how far out do we attack, does severity go down, etc.
+#
+# How far out from the original target do we attack? Zero means that we only
+# look at the hosts or network that you specify. One means look at neighboring
+# hosts, too. Anything over two is asking for problems, unless you are on the
+# inside of a firewall.
+$max_proximity_level = 0;
+
+# Attack level drops by this much each proximity level change
+$proximity_descent = 1;
+
+# when we go below zero attack, do we stop (0) or go on (1)?
+$sub_zero_proximity = 0;
+
+# a question; do we attack subnets when we nuke a target?
+# 0 = no; 1 = primary target subnet
+$attack_proximate_subnets = 0;
+
+#
+# Does SATAN run on an untrusted host? (0=no; 1=yes, this host may appear
+# in the rhosts, hosts.equiv or NFS export files of hosts that are being
+# probed).
+#
+$untrusted_host = 0;
+
+#
+# Any exceptions on who we want to hit?  E.g., stay away from the mil sites?
+# Also, you can specify *only* hit sites of a certain type; e.g. edu sites.
+#
+
+#
+# If $only_attack_these is non-null, *only* hit sites if they are of this
+# type.  You can specify a domain (podunk.edu) or network number
+# (192.9.9). You can specify a list of shell-like patterns with domains
+# or networks, separated by whitespace or commas.
+#
+# Examples:
+#
+# $only_attack_these = "podunk.edu";
+# $only_attack_these = "192.9.9";
+# $only_attack_these = "podunk.edu, 192.9.9";
+#
+$only_attack_these = "";
+
+#
+# Stay away from anyone that matches these patterns.
+#
+#  Example - leave government and military sites alone:
+#
+# $dont_attack_these = "gov, mil";
+$dont_attack_these = "";
+
+#
+# Set the following to nonzero if DNS (internet name service) is unavailable.
+#
+$dont_use_nslookup = 0;
+
+#
+# Should SATAN ping hosts to see if they are alive?
+#
+$dont_use_ping = 0;
+
+1;

@@ -1,0 +1,126 @@
+#!/usr/local/bin/perl5
+#
+#  information gatherer for dns -- uses NSLOOKUP, so you're hosed
+# unless you have that...
+#
+# XXX Must look for address->name servers too.
+#
+$running_under_satan = 1;
+
+require 'config/paths.pl';
+require 'perl/misc.pl';
+require 'perllib/getopts.pl';
+ 
+#
+$usage="Usage: $0 target\n";
+&Getopts("v");
+
+if ($#ARGV < 0) {
+	print STDERR $usage;
+	exit 1;
+	}
+$target = $ARGV[0];
+$service = &basename($0, ".satan");
+
+$status = "a";
+
+# open up NSLOOKUP
+die "Can't run $NSLOOKUP\n" unless open(NS, "$NSLOOKUP <<EOC
+set qt=any
+$target.
+EOC |");
+
+# until we change this, query away...
+$done = 0;
+
+while (<NS>) {
+	next if ($_ =~ />/);
+	chop;
+
+	# pick up any tidbits along the way...
+	&get_misc_dns_info();
+
+	# ok, lets get the places we can get authoritative answers...
+	if ($_ =~ /Authoritative answers/) { while (<NS>) {
+		last if ($_ =~ />/);
+		chop;
+		&get_misc_dns_info();
+		($auth, $garbage) = split;
+		$all_auth{"\L$auth\E"} = "\L$auth\E";
+		}
+		}
+	}
+
+$trustee = "";
+$trusted = "";
+$severity = "";
+$target_orig = $target;
+
+for $cpu (keys %cpu) {
+	$service_output = $cpu{$cpu};
+	$target = $cpu;
+	$text = "HINFO output";
+	&satan_print();
+	}
+for $os (keys %os) {
+	$service_output = $os{$os};
+	$target = $os;
+	$text = "HINFO output";
+	&satan_print();
+	}
+for $ma (keys %ma) {
+	$ma{$ma} =~ s/^([^\.]+)\.(.+)$/$1\@$2/;
+	$severity = "x";
+	$target = $ma;
+	$service_output = $ma{$ma};
+	$trusted = $ma;	
+	$text = "Mail address for DNS contact";
+	&satan_print();
+	}
+for $me (keys %me) {
+	$severity = "x";
+	$target = $target_orig;
+	# do we want the number here?
+	# $service_output = "$me $me{$me}";
+	$service_output = $me;
+	$trusted = $me;	
+	$text = "Mail exchanger";
+	&satan_print();
+	}
+
+# pursue this?
+#
+# print "\nauth-answers from:\n" if (defined(%all_auth));
+#	for $au (values %all_auth) {
+#		print "$au\n";
+#		}
+
+# print "\nnameservers:\n" if (defined(%ns));
+$trustee = "$target";
+for $ns (values %ns) {
+	$severity = "host";
+	$target = $target_orig;
+	$trusted = $ns;
+	$service_output = "";
+	$text = "authoritative DNS host";
+	&satan_print();
+	}
+
+#
+# suck in various stuff we can get from the records -- mail exchanger, cpu, etc.
+#
+sub get_misc_dns_info {
+
+if ($_ =~ /nameserver =/) { ($ns) = /nameserver = (\S+)/; $ns{$ns}="\L$ns\E"; }
+if ($_ =~ /CPU\s*=/) { ($cpu{$target}) = /CPU\s*=\s*(\S+)/; }
+if ($_ =~ /OS\s*=/) { ($os{$target}) = /OS\s*=\s*(\S+)/; }
+
+if ($_ =~ /mail exchanger/) {
+	($pref, $me) = /preference = (\S+).*mail exchanger = (\S+)/;
+	$pref =~ s/,//;
+	$me{$me} = $pref;
+	}
+
+if ($_ =~ /mail addr/) { ($ma{$target}) = /mail addr = (\S+)/; }
+
+}

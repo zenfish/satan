@@ -1,0 +1,37 @@
+<title>Scanning for the first time with SATAN</title>
+<H1><IMG SRC="../../images/satan.gif"> Scanning for the first time with SATAN</H1>
+<HR>
+<p>
+To "scan", in SATAN-ese, means to probe or test a remote host's security.
+SATAN has the ability to scan a great number of hosts on a network;
+fortunately or unfortunately, you may not have the authority or permission
+to scan all of the hosts.  SATAN should never be used to scan hosts that
+you haven't gotten explicit permission from the owner of the host that
+it is permissible to scan it.
+<p>
+<STRONG> Remember - you should run SATAN as "root"!</STRONG>
+<p>
+Assuming that you have the authority to do so, it is very simple to start
+scanning:
+<p>
+<OL>
+<li> From the control panel in the HTML interface, select
+	<I>Run SATAN</I>.  It will prompt you with
+	<I>Primary target selection</I>; type in the host that you're
+	running SATAN from if it already isn't in the prompt box.
+<li> Select <I>Scan the target host only</I>, or, if you would prefer
+	and have the authorization and the time (it can take several minutes
+	to scan a single host at the higher scan levels), select
+	<I>Scan all hosts in the primary (i.e. the target's) subnet</I>.
+<li> Select a <I>Normal</I> scan to start out with.  The more intensive
+	the scan the more time it takes to complete.
+<li> Select <I>Start the scan</I> to commence the scanning.
+</OL>
+<p>
+That's it!  If you have any problems (remember, SATAN is currently only
+supported on SunOS 4.x and IRIX 5.x), you should read the full
+documentation on <A HREF="../../docs/getting_started.html">
+using SATAN for the first time.</a>
+<p>
+You should now go to <A HREF="analyzing.html"> Analyzing the output</A>
+to see how to get and to interpret the results of your scan.

@@ -1,0 +1,79 @@
+.TH TCP_SCAN 1
+.SH NAME
+tcp_scan, udp_scan \- internet port scanners
+.SH SYNOPSIS
+.B tcp_scan
+[-abuU] [-l load] [-s string] [-w time] host service(s)...
+.sp
+.B udp_scan
+[-apuU] [-l load] host service(s)...
+.SH DESCRIPTION
+These commands take a list of internet services and investigate which
+services are available from a given host.  The \fItcp_scan\fR command
+looks for connection-oriented services; \fIudp_scan\fR identifies
+active datagram ports.
+.sp
+Each \fIservice\fR argument may be specified as a symbolic name
+(telnet), a port number (23), an interval (1-1023, telnet-smtp) or an
+interval with the lower or upper bounds missing (the default bounds are
+1 and 65535, respectively).
+.sp
+Options:
+.IP -a
+Report status of all specified services.
+.IP "-b (tcp_scan only)"
+Report banner information. Banners are converted to printable form
+using C-like escape sequences. Whenever \fItcp_scan\fR finds that the
+server does telnet options negotiation it sets the 't' flag in the
+output.  This is useful to detect telnet servers on non-standard ports.
+.IP "-l load"
+Minimize the impact of network roundtrip delays by performing
+\fIload\fR network probes in parallel. The default load is the
+per-process open-file limit - 10.
+.IP "-p port (udp_scan only)"
+Use this port to verify that the host or network is alive. By default
+the UDP port scanner uses port number 1. Specify a port number that is
+known to be unreachable or inactive.
+.IP "-s string (tcp_scan only)"
+After a connection has been established, send
+.I string
+to the server. The following backslash escapes can be used:  \\ooo
+(octal character code), \\b (backspace), \\f (formfeed), \\n (newline),
+\\r (carriage-return), \\s (space), and \\t (horizontal tab). The
+.I string
+should be enclosed between quotes if it contains shell meta characters.
+.IP "-t time (tcp_scan only)"
+Give up when the program has not found out anything within
+.I time
+seconds. This bounds the time lost when scanning systems with broken
+TCP/IP implementations that do not send RESETs when contacted at a dead
+port.  The udp scanner already has a built-in mechanism to detect dead
+hosts.
+.IP -u
+Report probes that fail with "Host unreachable". Use this with packet
+filters that pass most traffic.
+.IP -U
+Report probes that do \fInot\fR fail with "Host unreachable". Use this
+with packet filters that block most traffic.
+.IP "-w time (tcp_scan only)"
+Wait for at most \fItime\fR seconds for banner information.
+.SH WARNING
+These programs will raise lots of alarms on sites that run the \fItcp
+wrapper\fR or other network logging software. Use only with prior
+permission.
+.SH BUGS
+The UDP port scanner relies on ICMP replies to detect that a service is
+unavailable, and may report false positives when the host or network
+dies in the middle of a measurement.
+.PP
+The TCP port scanner does not keep track of roundtrip times or
+of retransmissions, and may overload hosts or networks.
+.PP
+With some UNIX implementations, a single "Host unreachable" condition
+affects all connections that are being established with that host.
+.PP
+With some UNIX implementations, a single "Host unreachable" condition
+affects all TCP connections to that host, even those that already
+exist.
+.SH AUTHOR
+Wietse Venema

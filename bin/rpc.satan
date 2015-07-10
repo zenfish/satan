@@ -1,0 +1,78 @@
+#!/usr/local/bin/perl5
+#
+#  Does an "rpcinfo -p" on a machine, tries to determine anything interesting
+# running there.
+#
+#  TODO -- verify args
+#
+# version 1, Mon Mar 20 21:05:44 1995, last mod by wietse
+#
+require 'config/paths.pl';
+require 'perl/misc.pl';
+
+die "usage: $0 target" unless ($#ARGV == 0);
+
+# fields for satan...
+$severity="x";
+$status="a";
+
+$target = $ARGV[0];
+
+open(RPC, "$RPCINFO -p $target|");
+
+while (<RPC>) {
+	chop;
+	($prog, $vers, $proto, $port, $name) = split;
+	if ($name eq "rexd" || $prog == 100017)		{ $rexd = 1; }
+	if ($name eq "arm")				{ $arm = 1; }
+	if ($name eq "bootparam" || $prog == 100026)	{ $bootparamd = 1; }
+	if ($name eq "ypserv" || $prog == 100004)	{ $ypserv = 1; }
+	if ($name eq "ypbind" || $prog == 100007)	{ $ypbind = 1; }
+	if ($name eq "selection_svc" || $prog == 100015){ $s_svc = 1; }
+	if ($name eq "nfs" || $prog == 100003)		{ $nfs = 1; }
+	if ($name eq "mountd" || $prog == 100005)	{ $mountd = 1; }
+	if ($name eq "rusersd" || $prog == 100002)	{ $rusersd = 1; }
+	if ($name eq "netinfobind" || $prog == 200100001){ $netinfobind = 1; }
+	if ($name eq "admind" || $prog == 100087)	{ $admind = 1; }
+}
+close(RPC);
+
+if ($rexd) {
+	$service = "rexd"; $text = "runs rexd"; &satan_print;
+}
+if ($arm) {
+	$service = "arm"; $text = "runs arm"; &satan_print;
+}
+if ($bootparamd) {
+	$service = "bootparam"; $text = "runs bootparam"; &satan_print;
+}
+if ($ypserv) {
+	$service = "ypserv"; $text = "is a NIS server"; &satan_print;
+}
+if ($ypbind) {
+	$service = "ypbind"; $text = "is a NIS client"; &satan_print;
+}
+if ($rusersd) {
+	$service = "rusersd"; $text = "runs rusersd"; &satan_print;
+}
+if ($nfs) {
+	$service = "nfs"; $text = "runs NFS"; &satan_print;
+}
+if ($mountd) {
+	$service = "mountd"; $text = "runs NFS"; &satan_print;
+}
+if ($s_svc) {
+	$service = "selection_svc"; $text = "runs selection_svc"; &satan_print;
+}
+if ($admind) {
+	$service = "admind"; $text = "runs admind"; &satan_print;
+}
+
+# print something out if nothing has happened so far...
+# if rpcinfo returns !0, then flag it; else, nothing interesting showed up.
+if ($text eq "") {
+	$severity="";
+	if ($?) { $text="rpcinfo error #$?"; }
+	else { $text="No rpcinfo output of interest"; }
+	&satan_print();
+}

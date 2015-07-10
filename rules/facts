@@ -1,0 +1,54 @@
+#
+# Rules that deduce new facts from existing data. Each rule is executed once
+# for each 'a' SATAN record. The rule format is:
+#
+#	condition TABs fact
+#
+# The condition is a PERL expression that has full access to the global
+# $target..$text variables, to functions, and to everything that has been
+# found sofar. The fact is a SATAN record. 
+#
+# Empty lines and text after a "#" character are ignored. Long lines may
+# be broken with backslash-newline.
+#
+#
+# version 1, Sun Mar 19 10:32:57 1995, last mod by zen
+#
+
+#
+# Assume rexd is insecure without even trying
+#
+/runs rexd/	$target|assert|a|us|ANY@$target|ANY@ANY|REXD access|rexd is vulnerable
+
+# SENDMAIL SECTION ;-)
+#
+# assume berkeley versions of sendmail < 8.6.10 are hosed:
+/sendmail 8\.6\.([0-9]+)/i && $1 < 10 \
+		$target|assert|a|rs|ANY@$target|ANY@$target|Sendmail vulnerabilities|sendmail pre 8.6.10
+
+#
+# other sendmail versions
+
+# HP
+/HP Sendmail \(1\.37\.109\.11/ \
+		$target|assert|a|rs|ANY@$target|ANY@$target|Sendmail vulnerabilities|sendmail pre 8.6.10
+
+#
+# Generic (or derived from) BSD; should have something >= 5.60
+/[Ss]endmail (5\.60)/ && $1 <= 5.60 \
+		$target|assert|a|rs|ANY@$target|ANY@$target|Sendmail vulnerabilities|sendmail pre 5.61
+
+#
+# Sequent/DYNIX; if <= 5.65, broken...
+/[Ss]endmail (5\.65)/ && $1 <= 5.65 && /DYNIX/ \
+		$target|assert|a|rs|ANY@$target|ANY@$target|Sendmail vulnerabilities|DYNIX sendmail, pre 5.65
+
+#
+# OTHER PROBLEMS
+#
+# 220 wuarchive.wustl.edu FTP server (Version wu-2.4(1) Mon 
+/ftp.*\(version wu-2.([0-9]+)/i && $1 < 4 \
+		$target|assert|a|rs|ANY@$target|ANY@$target|FTP vulnerabilities|wuftp pre 2.4
+
+# a modem on a port?  Surely you jest...
+/AT\\[nr].*OK\\[nr]/	$target|assert|a|rs|ANY@$target|ANY@$target|unrestricted modem|unrestricted modem on the Internet

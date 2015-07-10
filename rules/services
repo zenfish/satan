@@ -1,0 +1,49 @@
+#
+# Rules that classify hosts by service. These are applied to every 'a' SATAN
+# record. Basically, they translate the cryptic SATAN record data to something
+# that is more suitable for reports.
+#
+# Format of this file is:
+#
+#	class_name
+#	condition TABs service_name TABS host
+#
+# The class_name is SERVERS or CLIENTS.
+# 
+# The condition is a PERL expression, with full access to the global
+# $target..$text variables.
+#
+# The service_name field specifies a name such as "anonymous FTP" or
+# "NFS (diskless)".
+#
+# The host field specifies the host that takes or provides the service.
+# When no host is specified, $target is assumed.
+#
+# Empty lines and text after a "#" character are ignored. Long lines may
+# be broken with backslash-newline.
+#
+
+SERVERS
+
+$service eq "nntp"			NNTP (Usenet news)
+$service eq "ftp" && /ANONYMOUS/	Anonymous FTP
+/NIS server/				NIS
+/runs NFS| exports \S+ to /		NFS
+/mounts \S+ from (\S+)/			NFS			$1
+/offers domain/				DNS
+/\/root\/\S+ to \S+/			NFS (diskless)
+/offers gopher/				Gopher
+/offers http/				WWW
+/offers X-[0-9]+$/			X Windows
+$service eq "xdmcp"			XDM (X login)
+/telnet on port (\d+)/			Telnet on port $1
+/<title>/i && $service ne "http"	WWW (non-standard port)
+/0'QUIT'/ && $service ne "gopher"	Gopher (non-standard port)
+/220.*ftp server/i && $service ne "ftp"	FTP (non-standard port)
+
+CLIENTS
+
+/NIS client/				NIS
+/\/root\/\S+ to (\S+)/			NFS (diskless)		$1
+/exports \S+ to \(\S+\)/		NFS			$1
+/([^| ]+) mounts \S+ from \S+/		NFS			$1

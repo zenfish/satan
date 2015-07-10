@@ -1,0 +1,428 @@
+<HTML>
+<HEAD>
+<title>SATAN Frequently Asked Questions (FAQ)</title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">SATAN Frequently Asked Questions (FAQ)</H1>
+<HR>
+<H3>Table of Contents</H3>
+(Last-modified: April 10th, 1995)
+<ul>
+<li> <a href="#general"> General Questions
+<li> <a href="#trouble"> Troubleshooting
+<li> <a href="#compare"> Comparisons, Hype, etc.
+<li> <a href="#tech"> Tech Stuff
+<li> <a href="#vital"> Really Important Things
+</ul>
+
+<hr>
+<a name="general"></a>
+<H3>General questions</H3>
+<UL>
+<li> <A HREF="intro.html#what-is-satan">What is SATAN?</A>
+<li> <a href="../name.html">Why is it called SATAN?</a>
+<li> <a href="philosophy.html">Why in the hell (ahem) was it written?</a>
+<li> <a href="system_requirements.html">What does it run on?</a>
+<li> <a href="system_requirements.html#other-requirements">How do you get it?</a>
+<li> <a href="copyright.html">Is it freeware, Public Domain, Copyrighted...?</a>
+<li> <a href="artwork.html">Who did the cool artwork?</a>
+<li> <a href="philosophy.html#money">Who paid for the development?</a>
+<li> <a href="philosophy.html#money">Does any company, government, or organization endorse it?</a>
+<li> <a href="philosophy.html#white-hats">Why don't you release it just to the white hats (what about the system crackers)?</a>
+</UL>
+
+<a name="trouble"></a>
+<H3>Troubleshooting</H3>
+<h4>(Getting it to work/run at all)</h4>
+<UL>
+<li><a href="#linux">I'm trying to get SATAN running on my Linux box.
+Why won't it work?</a>
+<li><a href="#ultrix">I'm trying to get SATAN to compile on my ULTRIX box.
+Why won't it work/where is rpgen?</a>
+<li><a href="#compress">What do I need to uncompress the SATAN tar file?</a>
+<li><a href="#get-perl">Where do I get a version of perl that will work?</a>
+<li><a href="#upgrade">When I try to run SATAN, it says (something like):
+"missing right bracket at perl/getfqdn.pl line 48, at end of line"</a>
+<li><a href="#ctime">When I try to run SATAN, it says (something like):
+"Can't locate ctime.pl in @INC at perl/status.pl line 5."</a>
+<li><a href="#x-stuff">When I try to run satan I get "Xlib:connection
+to ":0.0" refused by server"</a>
+</ul>
+
+<h4>(Problems when running it)</h4>
+<ul>
+
+<li><a href="#bogus">SATAN doesn't find any hosts at all - it starts
+and stops with "(0 host(s) visited)".  This is bogus!  Give me my
+money back!</a>
+<li><a href="#crash">SATAN crashed, hung, or did very odd things to a system
+that it was run against.</a>
+<li><a href="FAQ.html#black-n-white">I'm using a B/W monitor, and it's
+hard to see the difference between red and black dots.  What can I do?</a>
+<li><a href="FAQ.html#www">How can I change from one HTML browser (e.g. Mosaic,
+Netscape, whatever) to another, without running reconfig or something?</a>
+<li><a href="FAQ.html#multi-fingers">Why does SATAN keep fingering the
+same host(s) over and over again?</a>
+<li><a href="#crash-n-burn">I ran SATAN to analyze my results and the
+machine slows grinds down to a standstill (and possibly crashes), but I
+don't get any answers.</a>
+<li><a href="#broken-dns">Given that Satan starts its own http server
+on the local host, why doesn't it use 'localhost' instead of the FQDN
+of the local host when trying to contact it?</a>
+<li><a href="#proxy">Whenever I click on a hyper link it doesn't work.</a>
+<li><a href="#merge">I merged some databases together with the "merge"
+function in the <i>SATAN Data Management</i>, but when I exited SATAN,
+they weren't saved.  What gives?</a>
+<li><a href="#processes">I get "bin/tcp_scan: socket: Too many open files"
+in the window from which I start Satan.</a>
+
+</UL>
+
+<a name="compare"></a>
+<H3>Comparisons, Hype, etc.</H3>
+<UL>
+<li> <a href="#the-big-deal">What's the deal?  Who cares?  Why all the publicity?</a>
+<li> <a href="#satan-n-cops">What's the difference between it and COPS?</a>
+<li> <a href="#satan-n-iss">What's the difference between it and ISS and other remote scanners?</a>
+<li> <a href="#remote-audit">What's a remote security auditing tool/probe/scanner?</a>
+</UL>
+
+<a name="tech"></a>
+<H3>Tech stuff</H3>
+<UL>
+<li> <a href="#black-n-white">I'm using a B/W monitor, and it's hard to
+see the difference between red and black dots.  What can I do?</a>
+<li> <a href="#www">How can I change from one HTML browser (e.g. Mosaic,
+Netscape, whatever) to another, without running reconfig or something?</a>
+<li> <a href="philosophy.html#why-scan">Why does it scan sites outside of
+your own domain?</a>
+<li> <a href="#warning-sites">Why doesn't it warn remote hosts that it is
+probing them?</a>
+<li> <A HREF="satan.probes.html">What is a .satan file, and how can I write
+my own?</A>
+<li> <A HREF="satan.rules.html">How can I write my own rules to teach SATAN
+about my site?</A>
+<li> <A HREF="satan.rules.html#drop">How can I teach SATAN to ignore
+	what it thinks is a vulnerability?</A> 
+<li> <a href="#multi-fingers">Why does SATAN keep fingering the same host(s)
+over and over again?</a>
+<li> <a href="#died">SATAN died (or the machine crashed, or whatever)
+in the middle of a run - do I have to start everything over again?</a>
+<li> <a href="#how-detect">How can I tell if anyone is running SATAN against
+me?</a>
+<li> <a href="#different-os">{When is the port of/can you help me port/do
+you have any information on porting} SATAN to MacOS/DOS/VMS/MVS/Whatever?</a>
+<li> <a href="#tmp-files">I see a lot of odd files that are appearing
+on my system after running SATAN, such as /tmp/sh11318, tmp_file.1288,
+etc.  What's the deal?</a>
+<li> <a href="#bug-check">Why doesn't SATAN check for
+[insert your favorite bug here]?</a>
+</UL>
+
+<a name="vital"></a>
+<H3>Really important things</H3>
+<UL>
+<li> <a href="#authors">How can I contact the authors?</a>
+<li> <a href="acknowledgements.html">Acknowledgements.</a>
+</UL>
+<hr>
+<a name="authors"><H3>How can I contact the authors?</H3></a>
+
+Send mail to <A HREF="mailto:satan@fish.com">satan@fish.com</A> (or click 
+on the e-mail address); this will be sent to both of the authors.
+Failing this, you can send mail directly to Dan:
+<A HREF="mailto:zen@fish.com">zen@fish.com</A>
+or Wietse:
+<A HREF="mailto:wietse@wzv.win.tue.nl">wietse@wzv.win.tue.nl</A>
+
+<a name="the-big-deal"><H3>What's the deal?  Who cares?  Why all the publicity?</H3></a>
+
+SATAN appears to be a tool written at the right time.  The current (as
+of April, 1995) flurry of concern and press about SATAN is not really
+all about SATAN - anything that is Internet related is big news these
+days.  Combine that with the recent Mitnick/Shimomura hunt and capture,
+as well as the latest IP spoofing techniques being publicized, and you
+have, for whatever reason, a big story in SATAN.
+<p>
+There are some technical reasons why SATAN is important - it
+<STRONG>does</STRONG> do and detect things that weren't possible before,
+at least by no other tools or methods that the authors knew about.  It's
+easy to use, and fills a gap that was only poorly covered by previous
+software.  However, the death of the Internet is not, and should not
+be predicted.
+
+<p>
+<a name="upgrade"><h3>When I try to run SATAN, it says (something like):
+"missing right bracket at perl/getfqdn.pl line 48, at end of line"</h3></a>
+You need to upgrade your version of perl - you're probably using the
+alpha version of perl5.
+
+<p>
+<a name="compress"><h3>What do I need to uncompress the SATAN tar file?</h3></a>
+To uncompress the archives, you'll need to use the Un*x uncompress program
+if it ends in ".Z", or the GNU unzip if it ends in ".gz".
+ 
+<p>
+<a name="get-perl"><h3>Where do I get a version of perl that will work?</h3></a>
+perl5 is available via anonymous ftp from ftp.netlabs.com
+ 
+<p>
+<a name="ctime"><h3>When I try to run SATAN, it says (something like):
+"Can't locate ctime.pl in @INC at perl/status.pl line 5."</h3></a>
+ctime.pl is bundled with perl5; if you've installed that, you should
+have it - look for it in the library subdirectories.  If it's there,
+as a last resort you can copy "ctime.pl" (and perhaps "getopts.pl"
+into the main SATAN directory, and SATAN should find it there.
+ 
+<p>
+<a name="x-stuff"><h3>When I try to run satan I get "Xlib:connection
+to ":0.0" refused by server"</h3></a>
+You can do a "xhost +hostname", where "hostname" is the host you're
+running it on, and try again.  Also, look at
+<a href="../tutorials/vulnerability/SATAN_password_disclosure.html">
+the problems with X, networks, and SATAN</a>
+
+<p>
+<a name="ultrix"><h3>I'm trying to get SATAN to compile on my ULTRIX box.
+Why won't it work/where is rpgen?</h3></a>
+DEC/Ultrix doesn't have "rpcgen".  You'll need to run it
+on another machine and drag the resulting source code over (or upgrade
+to SATAN version 1.1 or better.)
+
+<p>
+<a name="bogus"><h3>SATAN doesn't find any hosts at all - it starts
+and stops with "(0 host(s) visited)".  This is bogus!  Give me my
+money back!</h3></a>
+Calm down.  You probably can't use ICMP to detect if a host is alive
+or not.  Try setting "$dont_use_ping=1" in <i>config/satan.cf</i> (it's
+near the bottom.)  It should work, or we'll give you double your money back.
+
+<p>
+<a name="crash"><H3>SATAN crashed, hung, or did very odd things to a system
+that it was run against.</H3></a>
+We've received reports of various OS's that seem to have significant
+trouble with SATAN scans, particularily the UDP and TCP scans that span
+lots of ports.  Among the afflicted:
+
+<ul>
+<li>DEC Alphas running OSF/1 1.3 - generates a kernal memory fault when
+the UDP scan is done, rolls over and dies.  The file system is sufficiently
+hosed such that the system remains in single user mode upon reboot.
+<li>A few Mac's had ethernet problems, spewing packets back at the
+SATAN machine when fping-ed, causing the SATAN host to slow down
+tremendously trying to handle the traffic.
+<li>OS/2, version 3.0 of the networking code.  A report that it
+locked up the telnet and ftp daemons.  A restart of inetd is required
+to get things going again.
+<li>Ultrix systems running 4.2A - the elcsd process start
+to loop, consuming all available CPU cycles.
+<li>SunOS 5.4 - an extra inetd process is forked off, adding 1.0 to
+the system load.
+</ul>
+ 
+<p>
+<a name="crash-n-burn"><H3>I ran SATAN to analyze my results and the
+machine slows grinds down to a standstill (and possibly crashes), but I
+don't get any answers.</H3></a>
+
+It could be, with a large amount of data, that SATAN is using too much
+memory to fit in your machine.  An enormous amount of memory is
+consumed by the program (see
+<a href="system_requirements.html#memory>memory requirements</a> for
+more on this.)  Try checking the memory used by SATAN on your machine;
+if it needs more, get more memory - adding swap space is a very painful
+way of trying to deal with this.
+
+<p>
+<a name="broken-dns"><H3> Given that Satan starts its own http server
+on the local host, why doesn't it use 'localhost' instead of the FQDN
+of the local host when trying to contact it?</H3></a>
+
+This breaks some HTML browsers. Try running with $dont_use_nslookup (found
+in config/satan.cf) when your naming service is crippled.
+
+<p>
+<a name="proxy"><H3>Whenever I click on a hyper link it doesn't work.</H3></a>
+Be careful if you use proxy services (typically if you're behind a
+firewall you do) to access the WWW - you should unset environment
+variables (such as $http_proxy $file_proxy, $socks_ns, etc.) and/or
+change your browser's configuration to not use your SOCKS host or HTTP
+Proxy host (in your HTML browser's option section.)
+
+<p>
+<a name="merge"><h3>I merged some databases together with the "merge"
+function in the <i>SATAN Data Management</i>, but when I exited SATAN,
+they weren't saved.  What gives?</h3></a>
+The database merging only works in memory.  Currently there is no way to
+save this to disk (until the next version of SATAN.)
+
+<p>
+<a name="processes"><h3>I get "bin/tcp_scan: socket: Too many open files"
+in the window from which I start Satan.</h3></a>
+The machine's open file table is getting exhausted.  Tcp_scan backs off
+and succeeds after a few attempts.  You'll need to build a bigger kernel or
+run less processes.
+
+<p>
+<a name="linux"><H3>I'm trying to get SATAN running on my Linux box.</H3></a>
+Linux is far from a standard Un*x, and SATAN has a tendency to push the
+OS and perl to the limits.  We've tried to do as much as possible to
+make it work, but there are probably various problems we haven't found
+because we don't have a Linux box to play with.  (Cross?) posting to
+comp.security.unix and comp.os.linux.* could probably give you more
+help than we could.
+
+<p>
+<a name="warning-sites">
+<H3>Why doesn't it warn remote hosts that it is probing them?</H3></a>
+
+This could be built into satan; the most reliable general solution
+would be to send mail to the probed system (say, to "root" or "postmaster").
+A beta-tester suggested that an entry could be written to the target's
+syslog.  Neither of the solutions are incredibly reliable.  The
+former relies on someone reading the mail and the account existing, as
+well as having to deal with hundreds if not thousands of pieces of mail
+that might go to machines that the user of SATAN controls.  The latter
+has several problems, first and foremost in that it depends on people
+actually looking at the syslog records, and secondly that if an intruder
+uses SATAN to break in, they will typically "flatten", modify, or simply
+destroy such records.  Finally, many systems don't run or have non-standard
+syslog programs and quite a few filter out requests with packet filters,
+so they would never see the warning.
+<p>
+Nonetheless, we'll probably be putting either or both of these as options in
+the next release of SATAN.
+
+<p>
+<a name="satan-n-cops"><H3>What's the difference between it and COPS?</H3></a>
+
+COPS is a host-based Un*x security auditing tool; that means you run it
+on the host you wish to examine the security of.  SATAN is a remote
+<STRONG>network</STRONG> security auditing tool, which means it can report
+on the security of any host OR network that has IP connectivity to where
+you run the tool; you don't need an account or privileges on the remote
+targets to report on them.
+
+<p>
+<a name="satan-n-iss"><H3>What's the difference between it and ISS and other remote scanners?</H3></a>
+
+ISS, and any other remote auditing tool that we're aware of, scans a network
+or remote host and then reports on any problems that it may find.  While
+SATAN does that as well, the inferencing, the web of trust that it
+uncovers, the automatic probing of secondary targets, the rich reporting
+schema with context sensitive hypertext links to the documentation, the
+rich configurability, etc. all make SATAN different to what is currently
+available.
+
+<p>
+<a name="remote-audit"><H3>What's a remote security auditing tool/probe/scanner?</H3></a>
+
+This means it can report on the security of any host OR network that has
+IP connectivity to where you run the tool; you don't need an account or
+privileges on the remote targets to report on them.
+
+<p>
+<a name="black-n-white"><H3>I'm using a B/W monitor, and it's hard to
+see the difference between red and black dots.  What can I do?</H3></a>
+The easiest thing to do is to just mv (or link or whatever) the
+<i>html/dots/whitedot.gif</i> to <i>html/dots/reddot.gif</i>.  That'll
+give a much higher contrast and should be easier to read.
+
+<p>
+<a name="www"><H3>How can I change from one HTML browser (e.g. Mosaic,
+Netscape, whatever) to another, without running reconfig or something?</H3></a>
+Simply edit the file <i>config/paths.pl</i>.  You'll see a line that
+looks like:
+<PRE>
+    $MOSAIC = "/usr/local/bin/netscape";
+</PRE>
+Change the path inside the parenthesis to point to wherever your
+preferred browser is; for instance, if you want to use Mosaic, and it's
+in <i>/usr/bin/X11</i>, you'd change the above line to:
+<PRE>
+    $MOSAIC = "/usr/bin/X11/Mosaic";
+</PRE>
+
+<p>
+<a name="multi-fingers"><H3>Why does SATAN keep fingering the same host(s) over and over again?</H3></a>
+
+SATAN will finger a host repeatedly if it gets new information about the
+host; for instance, if it finds out that a user might exist on a host, it
+will finger to try and find out remote login information.
+
+<p>
+<a name="died"> <H3>SATAN died (or the machine crashed, or whatever)
+in the middle of a run - do I have to start everything over again?</H3></a>
+SATAN saves data at regular intervals to its database files; the easiest
+thing to do is to simply start it up again, with the same target and
+probe levels.  If SATAN has remembered anything, it will grind away for
+awhile, finding out what it has seen before, and then resume on the targets
+that it hasn't scanned.
+
+<p>
+<a name="how-detect"><H3>How can I tell if anyone is running SATAN against
+me?</H3></a>
+CIAC wrote and is distrbuting something called
+<a href="http://ciac.llnl.gov/ciac/ToolsUnixNetMon.html#Courtney">
+Courtney</a>, but it is far from foolproof.  It is very difficult
+to detect the lighter SATAN scans; the heavier ones, however, are
+typically best detected by running Wietse's tcpd wrappers and examining
+the logs - a good tipoff is if many of your machines in the same area
+log connections from the same remote site.  Some of the SATAN probes
+output a message to the console - if users report odd messages on their
+console screen, take them seriously ;-)
+
+<p>
+<a name="different-os"><H3>{When is the port of/can you help me port/do
+you have any information on porting} SATAN to MacOS/DOS/VMS/MVS/Whatever?</H3></a>
+SATAN, at least on the server side, is heavily linked to Un*x and perl5.  
+While it might be possible to port SATAN to one of these other OS's (if
+you can call them that! ;-)) would be fairly difficult and not something
+that either one of us wants to touch with a ten foot (or ~ 3 meter) pole.
+
+<p>
+<a name="tmp-files"><H3>I see a lot of odd files that are appearing
+on my system after running SATAN, such as /tmp/sh11318, tmp_file.1288,
+etc.  What's the deal?</H3></a>
+
+SATAN uses perl extensively in it's tests; the <i>.satan</i>
+probes use such commands as:
+<pre>
+    open(FOO, "|program <<_EOF
+    some input
+    more input
+    _EOF");
+</pre>
+This will leave a temporary file behind when SATAN determines that they
+have run out of time and kill off the probe.  Almost all temporary files
+that are created at various time within the SATAN are deleted
+automatically, but since the << files are created internally by the shell,
+it is impossible for SATAN to know how to delete the files
+that remain.  Simply delete them, or create a <i>cron</i> job to
+automatically sweep the <i>/tmp</i> directory for you.
+
+<p>
+<a name="bug-check"><H3>Why doesn't SATAN check for
+[insert your favorite bug here]?</H3></a>
+There are several reasons why SATAN does not probe for all known bugs:
+<UL>
+<LI>Pointing out bugs is one thing, but fixing them is not always
+possible. With the first release, SATAN focuses on problems that can be
+fixed or worked around by the system administrator, at least when the
+operating system version is reasonably up to date.
+<LI>The authors have only a few hours in the day available for SATAN
+development, and writing the data collection tools wasn't nearly as much
+fun as building the SATAN framework that controls them.
+<li>Many bugs are *extremely* difficult to check for, especially when
+you're dealing with code that has to return a yes or no in a very short
+time over potentially thousands of hosts.
+</UL>
+
+<hr>
+<p>
+<a href="../satan_documentation.html"> Back to the Documentation TOC</a>
+
+</BODY>
+</HTML>

@@ -1,0 +1,51 @@
+#!/usr/local/bin/perl5
+#
+#  Execute a bootparam WHOAMI request and report the results.
+#
+$running_under_satan = 1;
+require 'config/paths.pl';
+require 'perl/misc.pl';
+require 'perl/fix_hostname.pl';
+
+die "usage: $0 client server" unless ($#ARGV == 1);
+
+$target = $client = $ARGV[0];
+$server = $ARGV[1];
+
+# fields for satan...
+$severity="x";
+$status="a";
+$service = "boot";
+
+open(BOOT, "$BOOT $client $server|");
+
+while (<BOOT>) {
+	chop;
+	if (/domain_name:\s+(\S+)/) {
+		$service_output = "domain $1"; 
+		$target = $server; &satan_print;
+		$target = $client; &satan_print;
+	}
+	if (/client_name:\s+(\S+)/) {
+		$client = &fix_hostname($1, $server);
+		$service_output = "client $client"; 
+		$target = $client; &satan_print;
+	}
+	if (/router_addr:\s+(\S+)/) {
+		$service_output = "router $1"; 
+		$target = $client; &satan_print;
+	}
+}
+close(BOOT);
+
+# print something out if nothing has happened so far...
+# if rpcinfo returns !0, then flag it; else, nothing interesting showed up.
+if ($service_output eq "") {
+	$severity="";
+	if ($?) {
+		$text="boot error #$?";
+	} else {
+		$text="No boot output of interest";
+	}
+	&satan_print();
+}

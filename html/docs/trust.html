@@ -1,0 +1,60 @@
+<HTML>
+<HEAD>
+<title>TRUST</title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">Trust</H1>
+<HR>
+
+Trust is one of the most, if not the most, important concepts in SATAN.
+The issues and implications of trust are a bit more subtle and
+far-reaching than what we've covered before; in the context of this
+documentation we use the word trust whenever there is a situation when a
+server (note that any host that allows any remote access can be called a
+server) can have a local resource either used or compromised by a client
+with or without the proper authorization.  In addition, trust is
+transitive; e.g. if host <i>B</i> trusts host <i>A</i>, and an intruder
+can compromise host <i>A</i>, then the intruder can also compromise
+host <i>B</i>.
+
+<p>
+
+There are many ways that a host can trust: .rhosts and hosts.equiv files
+that allow access without password verification are the most common, but
+other examples are window servers that allow remote systems to use and
+abuse privileges; export files that control access via NFS, etc.
+However (and this is the most controversial statement about trust), we
+also say that if a host has had <strong>login</strong> accesses from
+another host, that the former host trusts the latter.  The reason for
+this is that unless extra authentication is being used, if a user logs
+in from a compromised remote host then the attacker can steal the
+password and data streams from the legitimate user and can almost
+compromise the host in question.
+
+<p>
+
+Although the concept of how host trust works is well understood by most
+system administrators, the <strong>dangers</strong> of trust, and the
+<strong>practical</strong> problem it represents, irrespective of
+trickier attacks such as hostname impersonation and IP spoofing, is one
+of the least understood problems we know of on the Internet.  This goes
+far beyond the obvious hosts.equiv and rhosts files; NFS, NIS, windowing
+systems -- indeed, much of the useful services in UNIX are based on the
+concept that well known (to an administrator or user) sites are trusted
+in some way.  What is not understood is how networking so tightly binds
+security between what are normally considered disjoint hosts.
+
+<p>
+
+<strong>Any</strong> form of trust can be spoofed, fooled, or subverted,
+especially when the authority that gets queried to check the credentials
+of the client is either outside of the server's administrative domain,
+when the trust mechanism is based on something that has a weak form of
+authentication, or if the security of the other system involved is
+outside of the direct control of the system administrator.  One or more
+of these are usually true.
+<hr>
+<a href="satan_overview.html"> Back to the Introductory TOC/Index</a>
+</BODY>
+</HTML>

@@ -1,0 +1,56 @@
+#!/usr/local/bin/perl5
+#
+# version 1, Mon Mar 20 18:44:32 1995, last mod by wietse
+#
+
+#
+# Report TCP services (banners where possible).
+#
+require 'config/paths.pl';
+require 'perl/misc.pl';
+require 'perllib/getopts.pl';
+
+$usage = "usage $0 [-v] ports target";
+
+&Getopts("v") || die $usage;
+die $usage unless ($#ARGV == 1);
+
+($services = $ARGV[0]) =~ tr /,/ /;
+$target = $ARGV[1];
+
+$severity = "x";
+$status = "a";
+
+$| = 1; 
+
+open(SERVICES, $SERVICES) || die "$0: cannot open $SERVICES: $!\n";
+while (<SERVICES>) {
+	$service_name{$2} = $1 if /(\S+)\s+([0-9]+)\/tcp/;
+}
+close(SERVICES);
+
+$command = "$TCP_SCAN -bs 'QUIT\\r\\n' $target $services";
+
+print "$command\n" if $opt_v;
+
+open(TCP_SCAN, "$command|")
+	|| die "$0: cannot run $TCP_SCAN";
+
+while(<TCP_SCAN>) {
+	if (defined($opt_v)) {
+	    print;
+	}
+	chop;
+	s/^600([0-9]):[^:]*/600$1:X-$1/;
+	s/^60([1-9][0-9]):[^:]*/60$1:X-$1/;
+	($port, $service, $flag, $service_output) = split(/:/, $_, 4);
+	$service = $service_name{$port} if $service_name{$port};
+	if ($flag =~ /t/ && $port != 23 && $service_output) {
+		$service = "telnet on port $port";
+	} elsif ($service eq "UNKNOWN") { 
+		$service = "$port:TCP"; 
+	}
+	$service_output =~ y/|/?/;
+	$text = "offers $service";
+	&satan_print();
+}

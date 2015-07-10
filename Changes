@@ -1,0 +1,336 @@
+1.1.1
+
+- URL filter was too strict, would reject names with () in them.
+
+1.1
+
+- bundled in ctime.pl and getopts.pl from the perllib.
+- trouble shooting docs now integrated with FAQ, and a full week of feedback
+  processed into FAQ and troubkle entries.
+- added a 13th vulnerability page. Irony has it that SATAN is the subject.
+  Surprise: CERT/CC posts advisory *before* a software update is available.
+- SATAN now detects that HTML clients reveal parent URL information.
+- eliminated extraneous ping probes.
+- strerror() is provided whether or not the compiler understands ANSI.
+- prevent compiler warnings about "& before array" in rpcgen output.
+- use waitpid() to find out when the HTML browser terminates.
+- moved 'require getopts.pl' down in bin/*.satan scripts.
+- fixed typos/errors/omissions/ambiguities in the documentation.
+- the -c option now changes individual perl variables. Example:
+  -c "dont_use_nslookup = 1; dont_use_icmp = 1". Useful for config
+  variables that have no command-line option.
+- dropped the -c alternate config file feature. There is no easy way
+  to both set *and* override defaults (short of writing our own getopt).
+- getfqdn() could be blind for nameless hosts when nslookup was enabled.
+- getfqdn() would be blind for nameless hosts when nslookup was disabled.
+- rsh test no longer relies on the rsh or remsh command (it worked 
+  only when the target account exists on the probing host), and it
+  now makes difference between "host trusts everyone" and "account
+  trusts everyone". It would claim that hosts are open when they
+  refuse access with a tcp wrapper banner message.
+- append dot in dns.satan query to avoid spurious name servers being
+  listed. This also may make things faster.
+- avoid duplicate "exports to the world" message (shut up showmount
+  message when running from an untrusted host).
+- added HTML client address check, in case the magic cookie leaks out.
+  This is just a last barrier; cookies should never be disclosed.
+- added URL name address check, in case the magic cookie leaks out.
+  This is just a last barrier; cookies should never be disclosed.
+- added an ANSI/POSIXized version of the rpcgen command for systems
+  without one (ultrix, some sysv4 versions).
+- more Linux support. There are many Linux versions so who knows where
+  this will work.
+- rsh tests are now executed only when the probing host is untrusted.
+- avoid duplicate tftp problem message by making it different for read 
+  and write.
+
+1.0! We made it!
+
+- just in case, dropped TUE references from all code except safe_finger
+  (which was stolen from the TCP wrapper) and the admin guide (which
+  was already posted one year ago with TUE reference in it).
+- dropped the unused rcmdinfo tool.
+- linked the troubleshooting guide.
+- deleted all references to set-uid tools - scripts cannot be made setuid.
+- added note about parallel runs to the satan.8 man page.
+- will ask the user to set $dont_use_dns when nslookup fails.
+- README & TODO - added disclaimer on parallelism; added AFS & SNMP to our
+  TODO list.
+- rm'd fireup
+- added proxy stuff to README and troubleshooting.html
+
+0.93
+
+- minor typos in the documentation keep popping up...
+- worked around a sys_errlist[] declaration clash in freebsd 2.0.
+- changed references to "session key" to "magic cookie".
+- fixed "back to.." link in the system requirements.
+- gave the session key writeup a more architectural tone.
+- fixed another duplicate filtering bug in danger report.
+- SATAN no longer dies (undefined host) when given an incomplete database.
+- clearer distinction of in-core and on-disk databases, and what happens
+  when you load/merge/open/query them.
+- fixed some typos in the FAQ.
+- commented out offending commands in satan.ps
+- fixed some typos in sendmail check.
+
+0.91
+
+- docs: user_interface, the_main_parts, satan_reference, satan_overview,
+  satan.db, FAQ (incl. adding your stuff to FAQ)
+- rules - 2 more sendmail checks - (<= 5.60), (<=5.65 && dynix) in facts,
+  improved DYNIX recognition
+- changed tutorial Sendmail_vulnerabilities.html
+
+0.90
+
+- more consistency (use of SATAN logo, intermediate headings).
+- broke down documentation into overview and reference.
+- fixed some dead links (_ instead of -).
+- figured out why lynx would not start up a problm.
+
+- put back in old/new satan.ps
+- writable-FTP tutorial - added cert link
+- reconfig - changed error msg to be more clear
+- minor changes to README
+- minor grammar and spelling changes to satan.8
+- Changed several docs - clarity, expansion, etc.
+- put in the troubleshooting.html guide
+
+- figured out why nfs-chk/yp-chk had trouble with Solaris.
+
+- cloned nfs-chk.satan to yp-chk.satan for nis map accessibility test.
+- added -d (domain name) option to ypbind.satan.
+- cloned nfs-chk to yp-chk and plugged in an YP client call.
+- Linux users are now instructed to copy BSD includes into the satan tree.
+
+- found the nfs ghost - missing initialization in dynamic page.
+- why tcpscan was too quick claimin telnet on non-std port.
+- added <HTML><HEAD><BODY> to the dynamic HTML pages.
+- consistent spelling of names (caps).
+- copied the alpha satan.ps, the ./satan.ps was busted.
+- changed font in acknowledgements from fixed width to something more
+  palatable.
+
+- bold faced our names in authors.html
+- fixed satan => SATAN in satan.8
+- added satan.ps
+- modified/added to html/docs/FAQ.html (red 'n' black dot controversy
+  on a B/W screen, changing HTML viewers, etc.)
+- mv'd html/docs/admin_guide_to_cracking => $!.html
+- changed a link in html/docs/references.html to above
+- changed html/docs/user_interface.html to have ALT's to dots
+- put a <HTML>, <HEAD>, and <BODY> into html/docs/*.html, and
+  in html/tutorials/vulnerability/*, also added some "ALT=..."
+- put in (identical) warnings about tcp-wrappers/reverse fingers, in
+  running for the first time tutorial and general usage docs.
+- nuked the glossary - no time to finish it right.
+- Nuked *.orig, *.bak, *.old
+
+- satan ships with execute bits off, to avoid stupid questions from people 
+  that did not run `reconfig' first, as described in the README file.
+- debugging mode is now off by default. You can tail -f the status_file
+  to watch progress.
+- added a first README file to get people started.
+- workaround for Solaris broken naming service (no cname to offical name)
+- added a few more names to the acknowledgements, fixed the simple-minded
+  "sort +1" that sorted on second name instead of last name.
+- in vulnerability tutorials, moved admin-guide links under the "other tips".
+- in the modem vulnerability tutorial, the phone bill went to the wrong party.
+- added sys/select.h includes for AIX.
+- now sorts subnets numerically
+
+- acknowledgements
+- put in the modem check... I hope this regex doesn't match
+  anything else by mistake!  (This is in rules/facts)  I'm making it
+  a "root" severity problem, just because it's so ghastly, more than
+  it being such a severe problem on that host.
+- fixed tftp to get /etc/group instead of /etc/passwd
+- html/docs/satan_doc.pl - added trust section
+- html/docs/trust.html - discussion of trust
+- fixed names in satan.8
+- fixed my personal statement
+- FIXED (!!!) back the satan control panel.  Data management should NOT
+  go first.
+- fixed grammar html/tutorials/vulnerability/REXD_access
+- uncommented root rsh and SGI rsh as guest
+- reconfig - add whoami
+- uncommented FAQ; still needs lots of work!
+- made links from tutorials to admin-guide-to-cracking
+- now show the current database name in the "open database" text field.
+- added -u (running from untrusted host) option and $untrusted variable.
+- changed wording of worldwide exports in nfs-chk.satan
+- moved umask 077 to main satan
+- tcpscan now continues after ICMP_UNREACH_NET or ICMP_UNREACH_PROTOCOL.
+- network targets didn't work anymore.
+- added "view primary target results" link.
+- target acq screen: added explanation of "normal" and "heavy" scans.
+- trust reports now sort by trust type as default.
+- added -A (proximity descent) and -z (sub zero proximity) options.
+- used wrong hostname variable in sort-by-trust-type reports.
+- dropped proximity stuff from the target acquisition screen.
+- fixed references to old timeout variable names in the admin html pages.
+- more trust classification rules.
+- added ';' after shell built-ins in Makefile (for HP-UX make).
+
+Satan beta 0.5
+
+- rescan is now default: before scanning, SATAN always drops old
+  information on primary hosts. Too many problems with todo rules 
+  being skipped at a low attack level, and never being triggered 
+  again whe the attack level was increased.
+- wrote a UNIX man page so we can tell them to Read the fine manual.
+- data mgt moved to the top - if you collect data first it does not
+  make sense to change databases later.
+- added "back to SATAN report analysis" links to the report screens.
+- worked around strange behavior when host or domain names end in au.
+  fix: all dynamic URLs now end in a comma.
+- some error screens had a non-standard layout.
+- replacing TYPE=NAME by TYPE="name" made things work better with Mosaic.
+- tcp_scan will calm down when the kernel runs out of file descriptors.
+- fixed extraneous Add-fact/todo/target messages in verbose logs.
+- fixed defective duplicate filter in danger level report.
+- added OSF to the list of mainstream systems (weird...)
+- save database to temp files, then rename. This avoids data loss
+  when the program is interrupted while saving. We should append
+  new stuff only but I'm not going to change the inference engine
+  in the last hour before the final beta.
+- all shell commands go through one routine so nothing escapes timeouts.
+
+- added SONY NEWS machines to hosttype, fixed apple type, now picks up BSDI
+  OS version
+- added an AUTHOR file in src/fping, to point to the current maintainer.
+- fixed reconfig to not look at dirs that don't exist, echo correct message,
+  look for remsh & if it exists, use it instead of rsh.  Changed top line
+  to be a better way (you might check this out; this was suggested by
+  tom christianson & larry wall, so I trust it.)
+- changed the satan.probes.html documentation significantly; minor change
+  to satan_documentation to reflect this.
+- added grep into paths.sh
+- moved data management menu item below targeting and results on main
+  control panel (html/satan.pl) - I really want to have targeting first,
+  then analysis, then the rest!
+- created a wu-archive ftp tutorial
+- small change in analysis.pl; "Widely" seems redundant, nuked it.
+- added question about multiple fingers to FAQ
+
+- not scanned hosts are now called "not scanned" instead of "unknown type".
+
+- added sort-by-trust-type links to the trusted and trusting host displays
+- documented the trust rule base.
+- fixed typo in trusting host sort order.
+- restored control panel order: choose data base before collecting data.
+- port scanners now take service names from config/services so that our
+  inference rules will be more robust. The system services tables are
+  used for everything not found in SATAN's service tables.
+- began cleaning up the html. Combining both quoting and italics on the
+  same word is just too much.
+- some hosts would stay "unknown type" after rescanning. Fix: add an UNKNOWN
+  pattern to rules/hosttype that matches both "" and "unknown type".
+- deleted the html/query subdirectory
+- SATAN now maintains a per-host last access time, displayed with host details.
+- faux-fping took only one argument and always did subnet expansion.
+  I replaced it by an fping-compatible one-liner.
+- updated docs about current locations of files.
+- subtle bugs eliminated by using explicit loop controls instead of $_.
+- subnet expansion did not update attack levels of already known hosts.
+- reconfig no longer needs to have #!/path/to/perl.
+- get_targets moved to bin.
+
+- fixed rsh.satan to not depend on remote location of commands
+- can now merge data bases (GUI only).
+- fix_hostname.pl could map IP addresses to unqualified hostnames.
+- SATAN could skip hosts that were dead on a previous run.
+- added support to rescan primary hosts (ignore old primary host results).
+- added -o option for 'scan only these'.
+- added -O option for 'skip these'.
+- added -c option for alternate config file.
+
+Satan 0.40 beta:
+
+- slightly changed -V flag to satan; prints out version, found in version.pl
+- removed *box*.gif *triangle*.gif from images directory
+- removed all but black, red, pink, and purple dots from dots dir
+- swept through all html files with a fairly fine-toothed comb and
+  programs, fixed all syntax errors that I could find.  This is mostly,
+  actually, the html/docs & html/tutorials dirs.removed "lines" subdirectory
+- all tool etc. file names are now controlled from config files.
+- now handles combinations of `scan only these' and `don't scan' exceptions.
+- now accepts multiple exceptions for `scan only these' and `don't scan'.
+- configuration GUI screen now shows current exception patterns.
+- syntax of exeption patterns changed from regexps to shell style.
+  it was symply too painful to get right.
+- config file edit script used the raw HTML attribute list with %hex codes.
+- generic editing of %hex codes emitted by web viewers.
+- GUI will now show a trace (with time stamps) of what satan is doing.
+- configurable pathnames in sh scripts moved to central file.
+- lots of dead links in the docs fixed.
+- big one: separate directories for config, commands, rules, scripts.
+- added "make setuid" target to the main Makefile.
+- status file is now updated when satan terminates.
+- status file cannot be specified on the command line (for parallel runs).
+
+Satan 0.36 beta:
+
+- added "continue with report and analysis" link to data management.
+- added a rules/trust file to classify trust relationships by type.
+- put back the "widely trusting hosts" link in the report table of contents.
+- added a $dont_use_ping flag (config file, docs and GUI) so you can make
+  SATAN believe that hosts are always reachable.
+
+Satan 0.34 beta:
+
+- print an error when get_targets fails instead of mysteriously terminating.
+- all hostnames should now be translated to lowercase
+- zap all prixy environment variables except no_proxy.
+- numerical $dont_attack_these and $only_attack_these patterns now work.
+- the boot.satan will now fire only when the client hostname resolves
+- DNS: added a $dont_use_nslookup flag (config file, docs and GUI).
+- made the rpcinfo tool more accurate.
+- use safe_finger instead of plain finger (thanks Lionel).
+- updated the documentation (fping is bundled, attack level probe lists).
+- fixed some list problems that Mosaic could choke on.
+- re-wrote the satan.cf attack level lists as per Lionel's suggestion.
+  This makes the portscanner implementation much cleaner. Tools are now 
+  listed _with_ arguments, so no more automatic ".satan" tricks.
+- rules.services claimed all gopher or www servers on non-standard ports.
+- fixed output flushing in *.satan tools.
+
+Satan 0.33 beta:
+
+- minor portscan.satan fix (will rewrite this according to Lionel's suggestion).
+- more reconfig fixes (would replace perl5 by perl55)
+- more shell command filtering
+- fixed timeout order in satan script
+- portability fixes for the tcp/udp port scanner (hp-ux)
+
+Satan 0.3 beta:
+
+- found why SATAN would no longer look up the host IP of unprobed hosts.
+- Doesn't die when reading malformed data
+- slight fix to nfs-chk.satan
+- cleaned up some html stuff/dead links
+- Added a test for pre 2.4 wustl ftp servers
+- Ever so small correction to reconfig... (I'm going to rewrite this in perl.)
+
+Satan 0.2 beta:
+
+- will now tell via the GUI how many hosts were visited.
+- GUI now shows status (unreachable) and scanning level info in the
+  per-host report.
+- fixed the reconfig script so it won't mangle perl path names anymore
+- will now tell you to become root or to make fping, tcp_scan etc. set-uid.
+- added a -V (version) command-line option. Unfortunately, PERL still
+  dumps core on IRIX 5.3 when SATAN is given a command-line option.
+- added a $running_under_html flag for GUI diagnostics
+
+Satan 0.1 beta:
+
+- fping is now completely integrated with satan.
+- better support of recursive `make -n'.
+- queries by host now support FQDN completion.
+- several broken html links fixed.
+- final solution for the sys/socket.ph problem.
+- Web client will now connect to hostname instead of 127.0.0.1.
+- nfs-chk tries both privileged and unprivileged client ports in the same run.
+- cleanup nslookup [x.x.x.x] result when cannot find a host.

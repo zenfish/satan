@@ -1,0 +1,12 @@
+#!/usr/local/bin/perl5
+#
+# fping replacement that skips unresolvable hosts.
+#
+
+$running_under_satan = 1;
+require 'perl/get_host.pl';
+require 'config/paths.pl';
+
+$timeout = 5;
+
+for (@ARGV) { system("$PING $_ $timeout") if &get_host_name($_); }

@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+#  Usage: $0 target_host
+#
+#  Quick (well, relative; quickly written code, not a quick test) tftp
+# checker.
+#
+#  Connects to the host, tries to get the password file.  Takes a long
+# time to timeout...
+#
+
+#
+#  Location of stuff:
+
+. config/paths.sh
+
+# need a target, eh?
+if $TEST $# -ne "1" ; then
+	$ECHO Usage: $0 target_host
+	exit 1
+	fi
+
+# used in final output
+target=$1
+service=`$BASENAME $0 | $SED 's/\..*$//'`
+status="a"
+
+# tmp and target file
+file=/etc/group
+TMP=./tmp.$$
+
+#
+#   Do the dirty work -- check tftp for the localhost, if it was found;
+# this might take a bit, since tftp might have to time out.
+{
+$TFTP << _XXX_
+connect $target
+get $file $TMP
+quit
+_XXX_
+}  > /dev/null 2> /dev/null
+
+if $TEST -s $TMP ; then
+	trustee="nobody@$target"
+	trusted="ANY@ANY"
+	service_output="TFTP file access"
+	text="tftp file read"
+	severity="nr"
+	$ECHO "$target|$service|$status|$severity|$trustee|$trusted|$service_output|$text"
+	# little trick; output it once, then again below, for both
+	# reading and writing.
+	text="tftp file write"
+	severity="nw"
+else
+	severity=""
+	trustee=""
+	trusted=""
+	service_output=""
+	text="tftp isn't running or is restricted"
+	fi
+
+$ECHO "$target|$service|$status|$severity|$trustee|$trusted|$service_output|$text"
+$RM -f $TMP
+
+exit 0
+
+# end of script

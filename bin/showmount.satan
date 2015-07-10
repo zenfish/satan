@@ -1,0 +1,110 @@
+#!/usr/local/bin/perl5
+#
+# Find out some stuff about NFS using showmount: world-wide exports,
+# boot clients.  Should not bother to do this when rpc.rip fails.
+#
+
+# require these packages:
+$running_under_satan = 1;
+require "config/paths.pl";
+require "perl/misc.pl";
+require "perl/fix_hostname.pl";
+ 
+if ($#ARGV != 0) {
+        print "Usage $0 target\n";
+        exit(1);
+        }
+
+$target = $ARGV[0];
+($service = $0) =~ s@^.*/([^\/\.]*)\..*$@$1@;
+
+#
+# we don't make value judgements here
+#
+
+$severity = "x";
+$service_output = "";
+
+# Showmount -e tells us who can mount what from this server.
+
+open(SM, "$SHOWMOUNT -e $target|");
+
+while (<SM>) {
+	chop;
+	next unless /^(\S+)\s+(\S+)\s*$/;
+	$files = $1;
+	@hosts = split(",", $2);
+	for $host (@hosts) {
+		$Host = $host;
+		$host =~ tr/A-Z/a-z/;
+		if ($host eq "\(everyone\)" || $Host eq "Everyone") {
+			next if $untrusted_host;
+			$status="a";
+			$trustee="$files\@$target";
+			$trusted="root\@ANY";
+			$service_output="unrestricted NFS export";
+			$text="exports $files to everyone";
+			}
+		else {
+			$fqdn = &fix_hostname($host ,$target);
+			# if the host doesn't really exist, it could
+			# be a netgroup or something... try to complete
+			# hostname if not FQDN, etc., then try to resolve.
+			# If everything fails, just output what we can:
+			if ($fqdn eq "") {
+				$status="u";
+				$trustee="$files\@$target";
+				$trusted="root\@$host";
+				$service_output="$target $host";
+				$text="exports $files to $host, but we can't verify that $host exists";
+				}
+			else {
+				$host = $fqdn;
+				$status="a";
+				$trustee="$files\@$target";
+				$trusted="root\@$host";
+				$service_output="$target $host";
+				$text="exports $files to $host";
+				}
+			}
+		&satan_print();
+		$print_flag = 1;
+		}
+	}
+
+# Showmount -a tells what systems actually mount from this server.
+
+open(SM, "$SHOWMOUNT -a $target|");
+
+while (<SM>) {
+	chop;
+	next unless /(\S+):(\S+)/;
+	($host = $1) =~ tr/A-Z/a-z/;
+	$path = $2;
+	$fqdn = &fix_hostname($host ,$target);
+	# If everything fails, just output what we can:
+	if ($fqdn eq "") {
+		$status="u";
+		$trustee="$path\@$target";
+		$trusted="root\@$host";
+		$service_output="$target $host";
+		$text="$host mounts $path from $target, but we can't verify that $host exists";
+	} else {
+		$host = $fqdn;
+		$status="a";
+		$trustee="$path\@$target";
+		$trusted="root\@$host";
+		$service_output="$target $host";
+		$text="$host mounts $path from $target";
+	}
+	&satan_print();
+	$print_flag = 1;
+}
+
+# print something out if nothing has happened so far...
+if (!$print_flag) {
+	$status="a";
+	$severity="";
+	$text="Not running showmount or other error";
+	&satan_print();
+}

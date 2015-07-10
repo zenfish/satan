@@ -1,0 +1,284 @@
+<HTML>
+<HEAD>
+<title>SATAN Configuration File</title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">The SATAN configuration file</H1>
+<HR>
+<p>
+<OL>
+<li> <A HREF="#attack-level"> Attack Level</A>
+<li> <A HREF="#correspond"> Which Probes Correspond to the Attack Level</A>
+<li> <A HREF="#status-file"> The What's and Where's of the Current Probe</A>
+<li> <A HREF="#timeouts"> Timeouts</A>
+<li> <A HREF="#timeout-signals"> Timeout Signals</A>
+<li> <A HREF="#prox-vars"> Proximity Variables</A> - <STRONG>IMPORTANT</STRONG>
+<li> <A HREF="#trust"> Trusted or Untrusted</A>
+<li> <A HREF="#exceptions"> Targeting Exceptions</A>
+<li> <A HREF="#workarounds"> Workarounds: DNS, ICMP </A>
+</OL>
+
+<HR>
+The SATAN configuration file (<I>config/satan.cf</I>) is
+<STRONG><I>VERY</I></STRONG> important!  Almost everything SATAN does
+when scanning hosts and networks is controlled through this file; how
+hard to probe the targets, how far the probes will spread from the
+original host, what tests will be run, etc.  While a limited number of
+configuration options can be controlled via the HTML user interface, the
+very low-level variables must be configured by manually editing this
+file.
+<p>
+This file is nothing more than perl code that gets run when the program
+initializes; don't be intimidated by that, however - it is fairly easy
+to read and is heavily commented (if you don't know perl, comments
+(lines that don't do anything) are lines that start with a sharp/pound
+sign ("#")).  Variables are tokens that start with a dollar sign; values
+of 0 or null ("") typically mean false, unless otherwise noted.
+<p>
+The easiest way to explain all of the options is by simply going over
+each line in the file and explain what it does:
+<p>
+<A NAME="attack-level"> <H3>Attack Level</H3> </A>
+<PRE>
+    # Default attack level (0=light, 1=normal, 2=heavy)
+    $attack_level = 0;
+</PRE>
+This sets the attack level, which in turn tells SATAN which probes
+to use (<A HREF="#attack-level"> see below</A>) against a target host.
+<p>
+<A NAME="correspond"> <H3>Which Probes Correspond to the Attack Level</H3></A>
+This section is a bit tricky; the 3 types of probes (light, normal,
+heavy) each have a set of programs that they use when
+probing a remote system.  As with any of the other variables in the
+program used, these can be changed as desired. the programs that are
+<p>
+However, there is one twist; not all probes are run, even though they
+might be listed under an attack level.  If a SATAN probe has a question
+mark ("?") appended to its name, it will run conditionally.
+What does this mean?  Take, for instance, the NFS SATAN checker.  There
+is no reason to run it if the remote system isn't running NFS (indeed,
+you shouldn't run it, because the program will waste time timing out on
+the remote host), so SATAN will only run this if it determines that NFS
+is being run.
+<p>
+So, examining the first few lines in this section reveals:
+<PRE>
+    # Probes by attack level.
+    #
+    # ? Means conditional, controlled by rules.todo. * Matches anything.
+    @light = (
+            'dns.satan',
+            'rpc.satan',
+            'showmount.satan?',
+            );
+</PRE>
+<p>
+This means that a light scan will run the <I>dns.satan</I> and the
+<I>rpc.satan</I> scans, and the <I>showmount.satan</I> if SATAN
+determines that the target is running NFS.  
+<p>
+A bit further down shows:
+<PRE>
+    @normal = (
+            @light, 
+            'finger.satan', 
+            'tcpscan.satan 70,80,ftp,telnet,smtp,nntp,uucp', 
+            'udpscan.satan 53,177',
+            'rusers.satan?', 
+            'boot.satan?',
+            );
+
+    @heavy = (
+            @normal,
+            $heavy_tcp_scan = 'tcpscan.satan 1-9999',
+            $heavy_udp_scan = 'udpscan.satan 1-2050,32767-33500',
+            '*?',
+            );
+</PRE>
+Nothing unusual here, except for the tcp and udp scan numbers; these
+refer to the port numbers that SATAN examines for signs of activity.
+<A NAME="status-file"> <H3>Status File</H3></A>
+SATAN keeps track of what the latest attack is in a file.  This filename
+is stored in <I>$status_file</I> and is updated before each new probe runs:
+<PRE>
+    # status file; keeps track of what probe is currently running and at what time it started
+    $status_file = "status_file";
+</PRE>
+<A NAME="timeouts"> <H3>Timeouts</H3></A>
+Certain network probes will "hang", or continue to try to contact the
+remote host for a <STRONG>very</STRONG> long time.  To prevent this from
+slowing down the overall scan, there are three timeout values (in
+seconds) that SATAN recognizes:
+<PRE>
+    # timeout values
+    $slow_timeout = 60;
+    $med_timeout = 20;
+    $fast_timeout = 10;
+</PRE>
+By default, all SATAN probes are launched with the same timeout value,
+which can be set from the command line or from the HTML interface.
+SATAN defaults to a medium timeout value.
+<p>
+Some tools need more time, such as the nfs checker, or the port scanner
+when many ports are to be scanned. For this reason you override the
+default timeout for specific tools. Examples:
+<pre>
+    %timeouts = (
+            'nfs-chk', $slow_timeout,
+            $heavy_tcp_scan, $slow_timeout,
+            );
+</pre>
+
+<p>
+
+<A NAME="timeout-signals"> <H3>Timeout Signals</H3></A>
+When a timeout occurs, a signal is sent to the process running to stop
+it.  This defaults to "9", which basically means that the process is toast:
+<PRE>
+    # what signal we send to nuke things when they timeout:
+    $timeout_kill = 9;
+</PRE>
+
+<A NAME="prox-vars"> <H3>Proximity Variables</H3></A>
+This is probably the most critical variable in the entire SATAN program.
+Under <STRONG>NO</STRONG> circumstances do you want to set this to
+anything over "3" unless you know <STRONG>EXACTLY</STRONG> what you're
+doing!  Anything over "0" can affect sites other than your own.
+<p>
+Proximity refers to how close the current target is from the original
+target of the SATAN probe.  For instance, if you probe
+<I>victim.com</I> and find that <I>nic.ddn.mil</I> is its
+nameserver, then <I>nic.ddn.mil</I>'s proximity level would be "1",
+and SATAN might probe that host next, depending on the rules you choose.
+<p>
+The number of hosts SATAN scans can grow exponentially, so again, be
+careful!
+<PRE>
+    #
+    # Proximity variables; how far out do we attack, does severity go down, etc.
+    #
+    # how far out from the original target do we attack?
+    $max_proximity_level = 0;
+</PRE>
+SATAN defaults to 0, which means that it will only scan the primary
+targets selected.
+<p>
+As SATAN gets farther away from the primary target, the attacks will get
+weaker - this presumes that you can attack your own sites as much as
+desired, but since you might not know where SATAN will end up, you'd
+like to be cautious the farther away the probes are going from your own
+host.
+<PRE>
+    # Attack level drops by this much each proximity level change
+    $proximity_descent = 1;
+</PRE>
+This value is subtracted from the current <A HREF="#attack-level">attack
+level</A> - a value of zero means that attacks do not diminish in
+strength.
+<p>
+If the attack level goes below zero, do you stop or go on?  The
+"$sub_zero_proximity" variable determines this:
+<PRE>
+    # when we go below zero attack severity, do we stop (0) or go on (1)?
+    $sub_zero_proximity = 0;
+</PRE>
+SATAN will, by default, examine only one target at a time.  If the
+"$attack_proximate_subnets" variable is set to "1", then
+<STRONG>ALL</STRONG> targets on the secondary target's subnet will be
+scanned.  Be <STRONG>VERY</STRONG> careful when changing this!a
+<PRE>
+    # a question; do we attack subnets when we nuke a target?
+    # 0 = no; 1 = primary target subnet
+    $attack_proximate_subnets = 0;
+</PRE>
+
+<A NAME="trust"> <H3>Trusted or Untrusted</H3>
+
+By default, SATAN assumes that it is being run from "inside". This
+means that the probing host may appear in other hosts <i>rhosts,
+hosts.equiv</i> or <i>NFS export</i> files. 
+
+<PRE>
+    #
+    # Does SATAN run on an untrusted host? (0=no; 1=yes, this host may appear
+    # in the rhosts, hosts.equiv or NFS export files of hosts that are being
+    # probed).
+    #
+    $untrusted_host = 0;
+</PRE>
+
+<A NAME="exceptions"> <H3>Targeting Exceptions</H3></A>
+Without precautions, SATAN can probe sites that you might not want
+it to.  Exceptions are a way to prevent SATAN from going astray.
+There are two ways of setting this up, and 
+each is controlled by a variable name.  The <I>$only_attack_these</I>
+variable is a list of domains and/or networks
+that tells SATAN to only attack hosts that match one of those patterns.
+For example, if you wanted SATAN to only attack educational sites,
+you could say:
+<PRE>
+    $only_attack_these = "edu";
+</PRE>
+Similarly, there is a variable, <I>$dont_attack_these</I>, which you 
+can set to a list of domains and/or networks that 
+SATAN should <STRONG><I>never</I></STRONG> attack.
+Looking at the last part of the configuration file gives further
+examples of this:
+<PRE>
+    #
+    # If $only_attack_these is non-null, *only* hit sites if they are of this
+    # type.  You can specify a domain (podunk.edu) or network number
+    # (192.9.9). You can specify any combination of domains and or networks
+    # as long as you separate them by whitespace and/or commas.
+    #
+    # Examples:
+    #
+    # $only_attack_these = "podunk.edu";
+    # $only_attack_these = "192.9.9";
+    # $only_attack_these = "podunk.edu, 192.9.9";
+    #
+    $only_attack_these = "";
+
+    #
+    # Stay away from anyone that matches these patterns.
+    #
+    #  Example - leave government and military sites alone:
+    #
+    # $dont_attack_these = "gov, mil";
+    $dont_attack_these = "";
+</PRE>
+
+<A NAME="workarounds"> <H3>Workarounds: DNS, ICMP</H3></A>
+
+<h4>DNS</h4>
+
+SATAN wants to use fully-qualified host names (<i>host.domain</i>)
+so that it can fix truncated hostnames, as found, for example, in
+<i>finger</i> output.
+The <code>$dont_use_nslookup</code> flag controls whether
+SATAN should use the <i>nslookup</i> command to look up hostnames.
+<pre>
+    # Set to nonzero if nslookup does not work.
+    $dont_use_nslookup = 0;
+</pre>
+
+<h4>ICMP</H4>
+
+Before probing a host, SATAN attempts to ping it. When the host does
+not respond, SATAN assumes the host is down and skips further probes.
+The <code>$dont_use_ping</code> controls whether SATAN should ping
+hosts before probing them. Set it to a non-zero value when ICMP does
+not work.  
+<pre>
+    # Set to nonzero if ICMP does not work.
+    $dont_use_ping = 0;
+</pre>
+<HR>
+Of course, reading the perl code in the various modules can give more
+hints on all of these configuration file options.
+
+<hr>
+<a href="satan_reference.html"> Back to the Reference TOC/Index</a>
+</BODY>
+</HTML>

@@ -1,0 +1,18 @@
+TODO list for future (SATAN version 1.1, 2.0, whatever)
+----------------------------------------------------------
+
+o	Enable SATAN to fork and run several scans in parallel
+o       Talk about sending mail/syslog to each host scanned
+o       Look at and deal with subnet masks properly...
+o       Put in a DNS walker
+o       fix rex client strategy (rex client is currently not being used)
+o       get a more complete list of banners from vendors and Internet
+        on what is vulnerable and not, for the rules/* files.
+o       many more bug tests, etc.
+o	Add AFS testing support; currently there is none
+o	Add SNMP testing/probing
+
+And most importantly:
+
+o       MAPS!  Big graphical maps that can *show* the relationships
+        and are clickable to let users zoom into things, etc...

@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# If the host permits on/rexd with default auth_unix authentication,
+# get the message of the day to prove we were in.
+
+. config/paths.sh
+
+# used in final output
+target=$1
+service=`$BASENAME $0 | $SED 's/\..*$//'`
+status="a"
+
+tmp_file=/tmp/rex.$$
+
+trap "$RM -f $tmp_file; exit" 0 1 2 3 15
+
+case $# in
+    1) target=$1;;
+    *) $ECHO Usage: $0 target 1>&2; exit 1;;
+esac
+
+# need the C program/exe to do the real work:
+if $TEST ! -f "$REX" ; then
+	exit 1
+	fi
+
+$REX -a 1,1,1 $target date >$tmp_file 2>/dev/null
+
+if $TEST -s $tmp_file ; then
+	severity="us"
+	trustee="USER@$target"
+	trusted="ANY@ANY"
+	service_output="REXD access"
+	text="rexd is vulnerable to the world"
+else
+	severity=""
+	trustee=""
+	trusted=""
+	service_output=""
+	text="rexd isn't vulnerable"
+	fi
+
+$RM -f $tmp_file
+
+$ECHO "$target|$service|$status|$severity|$trustee|$trusted|$service_output|$text"
+
+# that's it...

@@ -1,0 +1,28 @@
+#
+# Rules that classify hosts by trust relationship. These are applied to
+# every 'a' SATAN record. Basically, they translate the cryptic SATAN
+# record data to something that is more suitable for reports.
+#
+# Format of this file is:
+#
+#	condition TABs relationship
+# 
+# The condition is a PERL expression, with full access to the global
+# $target..$text variables.
+#
+# The relationship field specifies a name such as "remote login" or
+# "file sharing".
+#
+# Empty lines and text after a "#" character are ignored. Long lines may
+# be broken with backslash-newline.
+#
+# version 1, Mon Mar 27  9:30:32 1995, last mod by wietse
+#
+
+$severity eq "l" && $trustee =~ /^root@/	root login
+$severity eq "l" && $trustee !~ /^root@/	user login
+$text =~ /exports \S+ to/			NFS export
+$text =~ / mounts \S+/				NFS export
+/serves nis domain/				NIS client
+$trustee =~ /\/export\/root\/(.*)@(.*)/		boot client
+/authoritative DNS host/			domain name service

@@ -1,0 +1,14 @@
+BASENAME=/bin/basename
+CAT=/bin/cat
+ECHO=/bin/echo
+FILE=/bin/file
+RM=/bin/rm
+RSH=/usr/ucb/rsh
+SED=/bin/sed
+SU=/bin/su
+TEST=/bin/test
+TFTP=/usr/ucb/tftp
+WHOAMI=/usr/ucb/whoami
+GREP=/bin/grep
+REX=bin/rex
+RCMD=bin/rcmd

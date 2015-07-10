@@ -1,0 +1,82 @@
+* Revision 1.20  1993/02/23  00:16:38  schemers
+
+fixed syntax error (should have compiled before checking in...)
+
+* Revision 1.19  1993/02/23  00:15:15  schemers
+
+turned off printing of "is alive" when -a is specified.
+
+* Revision 1.18  1992/07/28  15:16:44  schemers
+
+added a fflush(stdout) call before the summary is sent to stderr, so
+everything shows up in the right order.
+
+* Revision 1.17  1992/07/23  03:29:42  schemers
+* Revision 1.16  1992/07/22  19:24:37  schemers
+
+Fixed declaration of timeval_diff. Didn't notice the problem because
+I use 'cc' in stead of gcc under Ultrix. Time to switch? :-)
+
+Modified file reaing so it would skip blank lines or lines starting
+with a '#'. Now you can do something like:
+
+fping -ad < /etc/hosts
+
+* Revision 1.15  1992/07/21  17:07:18  schemers
+
+Put in sanity checks so only root can specify "dangerous" options.
+Changed usage to show switchs in alphabetical order.
+* Revision 1.14  1992/07/21  16:40:52  schemers
+* Revision 1.13  1992/07/17  21:02:17  schemers
+
+Changed the default timeout to 2500 msec, and retry to 3. This was
+due to suggestions from people with slow (WAN) networks. The default
+1 sec timeout was too fast.
+
+
+Added '-e' option for showing elapsed (round-trip) times on pakets, and
+modified the -s option to include min, max, and average round-trip times,
+and over all elapsed time.
+
+Modified action taken when a error is returned from sendto. The action
+taken now considers the host unreachable and prints the hostname 
+followed by the errno message. The program will not exit and will continue
+to try other hosts.
+
+* Revision 1.12  1992/07/17  16:38:54  schemers
+* Revision 1.11  1992/07/17  16:28:38  schemers
+
+ move socket create call so I could do a setuid(getuid()) before the
+ fopen call is made. Once the socket is created root privs aren't needed
+ to send stuff out on it.
+
+ moved num_timeout counter. It really was for debug purposes and didn't
+ make sense to the general public :-) Now it is the number of timeouts
+ (pings that didn't get received with the time limit).
+
+
+* Revision 1.10 1992/07/16  16:24:38  schemers
+* Revision 1.9  1992/07/16  16:00:04  schemers
+* Revision 1.8  1992/07/16  05:44:41  schemers
+
+Added _NO_PROTO stuff for older compilers, and _POSIX_SOURCE
+for unistd.h, and _POSIX_SOURCE for stdlib.h. Also added
+check for __cplusplus.
+
+Now compiles ok under Ultrix 3.1, and Sun4 using cc. Also compiled
+ok using g++ 2.2.2.
+
+Changed '-a' and '-u' flags to be mutually exclusive (makes sense, since
+specifiying both '-a' and '-u' is the same as not specifiying anything.
+Since '-a' and '-u' are mutually exclusive, these options now only print
+the hostname, and not the 'is alive' or 'is unreachable'  messages.
+This makes it much easier to do stuff like:
+
+#!/usr/local/bin/perl
+$hosts_to_backup=`cat /etc/hosts.backup|fping -a`;
+
+Since you don't have to strip off the 'is alive' messages.
+
+Changed usage to and stats to print to stderr instead of stdout.
+
+

@@ -1,0 +1,327 @@
+<HTML>
+<HEAD>
+<title>The SATAN User Interface</title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">The SATAN User Interface</H1>
+<HR>
+SATAN was designed to have a very "user friendly"
+user interface.  Since it is extremely difficult to create a good user
+interface from scratch, we stole everyone else's.  All of the output (of
+the non-debugging sort) and nearly all of the interface uses HTML,
+so as a user you can utilize any number of incredible HTML display
+programs such as Netscape, Mosaic, lynx (for those stuck with text-only
+displays), etc.
+<p>
+Subsections in the User Interface section:
+<UL>
+<LI><A HREF="#basics">The Basics</A>
+<LI><A HREF="#data-mgmt">Data Management</A>
+<LI><A HREF="#gathering-data">Gathering Data</A>
+<LI><A HREF="#looking">Looking at and understanding the results</A>
+<LI><A HREF="#tricky-implications">Hints, Further tricky security implications,
+or Getting The Big Picture (tm)</A>
+<LI><A HREF="#command-line">The Command-line Interface</A>
+</UL>
+<hr>
+
+<p>
+<A NAME="basics"><H3>The Basics</H3></A>
+<STRONG>An HTML browser is REQUIRED to do report queries</STRONG>.
+It is highly suggested that you use it to read the
+documentation, if nothing else to print it out and read it via
+hard-copy, since it's also all in HTML (later versions of SATAN will
+almost certainly have non-HTML documentation, but the time pressures of
+the project eliminated this as a viable option for the first release of
+SATAN.)
+(While all of the program interface and documentation uses hypertext
+extensively; it's beyond the scope of this document to explain how to
+use a HTML browser, but all of them come with fairly extensive
+documentation and are very easy to use.)
+<p>
+This part of the documentation covers some of the basic design concepts
+and how to move around the SATAN user interface.  However, <STRONG>with
+the exception of the <I>target acquisition</I> part of the
+program</STRONG> (we don't want you to learn how to probe hosts by trial
+and error!), the best way to learn how to use the program is to
+simply start pointing and clicking with your mouse or with the arrow
+keys on your keyboard.
+
+<p>
+<A NAME="data-mgmt"><H3>Data Management</H3></A>
+SATAN has a very simple way of opening or creating its databases (this
+is how SATAN keeps all of its records, including the hosts that it's seen
+(in the <I>all-hosts</I> file), the current set of facts (in the
+<I>facts</I> file), and what should be run next (<I>todo</I>) - see the
+<A HREF="satan.db.html">SATAN database description</A> if you'd like
+more information on those files.
+
+<p>
+All of SATAN's data collection output will go to the current set of
+databases, which are kept in the results directory in a subdirectory
+that has the current database name.  A default database, called
+<i>satan-data</i> will be automatically created if no other name is
+chosen.
+
+<p>
+If you choose the <I>SATAN Data Management</I> from the <I>SATAN Control
+Panel</I>, you have three choices; open an existing set of data,
+start a new database, or to merge the contents of an on-disk database 
+with the in-core data.
+
+<p>
+<STRONG>Note!</STRONG>
+Opening or creating a new database will destroy all other in-core
+information from other databases or scans. For this reason it is a good
+idea to choose a database <i>before</i> collecting data.  All queries
+will go to the in-core database. New data collection results, etc.
+will go into the currently selected on-disk database.
+
+<p>
+Merging a database concatenates the contents of the chosen on-disk
+database to the in-core information.  Although care
+must be taken to have enough physical memory to contain all the databases,
+SATAN becomes more and more interesting as more information is 
+combined, because more correlation, trust, and patterns can
+be detected.  In addition, when large databases from different but
+connected (users log in from one site to another, or important
+data is being shared) sites are placed together, <strong>better</strong>
+information can be gotten for both sites.  If you know friendly neighboring
+system administrators, instead of asking for permission to scan their
+site, exchange your latest SATAN database with each other, and help
+each other out.  It would be interesting to put together hundreds of
+thousands of hosts from the Internet and see what happens (although the
+memory and CPU speed required to process this amount of data would
+be formidable!)
+
+<p>
+<A NAME="gathering-data"><H3>Gathering Data</H3></A>
+Gathering information about hosts is very easy when using SATAN - too
+easy sometimes, because it follows lines of trust that are often hidden
+from casual observation, and you'll soon find it scanning networks and
+hosts that you had no idea were connected to your net.  As an
+intellectual or learning exercise this is wonderful, but many sites take
+a dim view of you probing (or "attacking", as they'll claim) their site
+without prior permission.  So don't do it.
+<p>
+The easiest and safest way to gather it is by simply selecting a
+target host that you'd like to know more about and then probe that host
+(and the subnet as well, if you wish) with the default settings: 
+no host-to-subnet expansion, and a maximum
+proximity level of zero (see the <a href=satan.cf.html> config/satan.cf</a>
+(SATAN configuration) file for more on this.)
+<p>
+See the <a href="../tutorials/first_time/scanning.html"> tutorial</a>
+on how to scan a target for the first time.
+
+<p>
+<A NAME="looking"><H3>Looking at and understanding the results</H3></A>
+Easy to use, hard to describe.  That's how the SATAN <I>Reporting and
+Analysis</I> works.  There are three broad categories (vulnerabilities,
+information, and trust), each with
+fundamental differences in how they approach and analyze the data
+gathered from scanning.  However, since
+so much information is tied together with the hypertext, you can start from
+any of these categories and find the same information but with a
+different emphasis or display on certain parts of the information.  Most
+queries will present the user with an index that facilitates movement
+within that query type - the amount of information can get quite large -
+and a link that will lead the user back to the Table of Contents.  In
+addition, vulnerabilities have links to a description of the problem,
+including what it is, what the implications are with respect to
+security, as well as how to fix it.  If a CERT advisory applies to this
+particular problem then there is a link to that as well.
+<OL>
+<li><a href="#vulnerabilities"><STRONG>Vulnerabilities</STRONG></a>.
+This is what most people think of when they think of SATAN - what/where
+are the weak points of the host/network.
+<li><a href="#hostinfo"><STRONG>Host Information</STRONG></a>.  Very
+valuable information - this can show where the servers are, what the
+important hosts are, breakdown the network into subnets, organizational
+domains, etc.  In addition, you can query about any individual host
+here.
+<li><a href="#trust"><STRONG>Trust</STRONG></a>.  SATAN can follow
+the web of trust between systems - trust through remote logins,
+trust by sharing file systems.
+</OL>
+
+<a name="vulnerabilities"><STRONG>Vulnerabilities</STRONG></a>
+<p>
+There are three basic ways of looking at the vulnerability results of
+your scan:
+<UL>
+<li>Approximate Danger Level.  All of the probes generate a basic level
+of danger if they find a potential problem; this sorts all the problems
+by severity level (e.g. the most serious level compromises root on the
+target host, the least allows an unprivileged file to be remotely read.)
+<li>Type of Vulnerability.  This simply shows all the types of
+vulnerabilities found in the probe, plus a corresponding list of hosts
+that fall under that vulnerability.
+<li>Vulnerability Count.  This shows which hosts have the most problems,
+by sheer number of vulnerabilities found by the probe.
+</UL>
+Try looking at all of the different ways of looking at any
+vulnerabilities found by the probe to see which is most intuitive or
+informative to you; after using the tool for some time, it becomes
+easier to learn which type of query is the best for the current
+situation.
+
+<p>
+<a name="hostinfo"><STRONG>Host Information</STRONG></a>
+<p>
+An enormous amount of information can be gained by examining the various
+subcategories of this section - remember, the more intensive the SATAN
+probe, the more information will be gathered.  Typically this will show
+either the numbers of hosts that fall under the specific category with
+hypertext links to more specific information about the hosts or the
+actual list of hosts (which can be sorted into different orders on the
+fly).  If there is a host listed with a red dot
+(<IMG SRC="../dots/reddot.gif" ALT="*">) next to it, that means the
+host has a vulnerability that could compromise it.
+Note that if SATAN reports a problem, it means the problem is
+<strong>possibly</strong>
+present.  The presence of Wietse's TCP wrapper, a packet filter, firewall,
+other security measures, or just incomplete information or assumptions may 
+mean that what SATAN "sees" is not the real picture.
+
+A black dot
+(<IMG SRC="../dots/blackdot.gif" ALT="-">) means that no vulnerabilities
+have been found for that particular host yet.
+Note that a black dot next to the host does <strong>NOT</strong> mean
+that the host has no security holes.  It only means that SATAN didn't
+find any; scanning at a higher level or additional probes might find
+some further information, and examining the SATAN database to see if
+probes were timing out rather than failing might mean the probes should be
+run a second time.  Clicking on links
+will give you more information on that host, network, piece of
+information, or vulnerability, just as expected.
+<p>
+The categories are:
+<UL>
+<li>Class of Service.  This shows the various network services that the
+collected group of probed hosts offer - anonymous FTP, WWW, etc.
+Gathered by examining information garnered by <I>rpcinfo</I> and by
+scanning TCP ports.
+<li>System Type.  Breaks down the probed hosts by the hardware type
+(Sun, SGI, Ultrix, etc.); this is further subdivided by the OS version,
+if possible to ascertain.  This is inferred by 
+the various network banners of <I>ftp</I>, <I>telnet</I>, and 
+<I>sendmail</I>.
+<li>Internet Domain.  Shows the various hosts broken down into DNS
+domains.  This is very useful when trying to understand which domains
+are administered well or are more important (either by sheer numbers or
+by examining the numbers of servers or key hosts, etc.)
+<li>Subnet.  A subnet (as far as SATAN is concerned) is a block of up
+to 256 adjacent network addresses, all within the last octet of the IP
+address.  This is the most common way of breaking up small
+organizations, and can be useful for showing the physical location or
+concentration of hosts in larger systems.
+<li>Host name.  Allows a <STRONG>query</STRONG> of the current database
+of probe information about a specific host.
+</UL>
+
+<p>
+<A NAME="trust"><strong>Trust</strong></A>
+<p>
+This is a way of
+finding out the most important hosts on the network; the more hosts that
+trust a host (e.g. depend on some service, have logged in from the host,
+etc.), the more interesting it is to break-in from the outside, for once
+broken into an intruder could either break into or at least have a much
+better chance to break into the dependent hosts as well.
+
+<p>
+<A NAME="tricky-implications"><H3>Hints, Further Tricky Security Implications,
+or Getting the Big Picture</H3></A>
+It's just as important to understand what the SATAN reports <I>don't</I>
+show as well as what they show.  It can be very comforting to see SATAN
+returning a clean bill of health (i.e. no vulnerabilities found), but
+that will often merely mean that more probing should be done.  Here are
+some general suggestions on how to get the most out of SATAN; this
+requires a fairly good understanding of the 
+<a href=satan.cf.html> config/satan.cf</a> (SATAN configuration) file:
+<UL>
+<li>Probe your own hosts from an <STRONG>EXTERNAL</STRONG> site!  This
+is a <STRONG>necessity</STRONG> for firewalls, and a very good idea
+for sites in general.
+<li>Probe your hosts as heavily as possible, and use a high
+$proximity_descent value (2 or 3 are good.)
+<li>Use a very low $max_proximity_level - it is almost never necessary
+to use more than 2.  However, if you're behind a firewall (e.g.
+have no direct IP connectivity from the host that is running the SATAN
+scan (Be <STRONG>VERY</STRONG> careful if you're running SATAN behind a
+firewall that allows inside users to have direct IP connectivity to hosts
+on the Internet!  You are essentially on the Internet as far as SATAN
+is concerned), you can set this higher.  There should be almost no reason
+to ever set this to anything beyond single digits.
+
+<li>Start with light probes and probe more heavily when you see
+potential danger spots.  Keep tight control over what you scan - don't
+scan other people's hosts without permission!
+<li>Use the <I>$only_attack_these</I> and <I>$dont_attack_these</I>
+variables to control where your attacks are going.
+<li>Collect all of your user's <I>.rhosts</I> files and make a list of
+all external hosts found there.  Get permission from the system administrators
+of those remote sites and run SATAN against <STRONG>all</STRONG> of them.
+<li>If you have a host that a lot of other hosts trust or have critical
+hosts, make sure that you scan these hosts with a "heavy" scan to help
+ensure that no one can gain access to these.  Unless politically
+impossible, scan the entire subnet of these key hosts as well, because
+once on a subnet, it's very easy to break into other hosts on the same
+subnet.
+</UL>
+<p>
+<A NAME="command-line"><H3>The Command-line Interface</H3></A>
+For those without a good HTML browser, for those die-hard Un*x types
+that despise GUI's, or for simply firing off probes when you don't want
+to leave a several megabyte memory hog (your HTML viewer) doing
+essentially nothing, all of the probing functionality is accessible from
+your favorite Un*x shell prompt.  However, you <STRONG>cannot</STRONG>
+examine the reports, do queries, or any of a number of other nifty
+things by simply using the command line.  This is because the reporting
+programs were written to emit HTML code, and even the two hard-core Un*x
+hackers who wrote this program love (and hate, we must admit) what HTML
+can do.
+<p>
+Here are the command line options, what they do, and what SATAN
+variables they correspond to. 
+Further explanations
+of the variables that are mentioned here can be found in the
+<a href=satan.cf.html> config/satan.cf</a> (SATAN configuration) file.
+<p>
+SATAN enters interactive mode when no target host is specified. 
+<p>
+<dl compact>
+<DT>-a <dd> Attack level (0=light, 1=normal, 2=heavy). Variable:
+<i>$attack_level</i>.
+<p><dt>-c 'name = value; name = value...' <dd> Change SATAN variables. 
+Use this to overrule configuration variables that do not have their
+own command-line option.
+<p><dt>-d <dd> SATAN database to read already collected data from,
+and to save new data to.  Variable: <i>$satan_data</i>.
+<p><dt>-i <dd> Ignore already collected data.
+<p><dt>-l <dd> Maximal proximity level. Variable: <i>$max_proximity_level</i>.
+<p><dt>-o list <dd> Scan only these hosts, domains or networks. Variable: 
+<i>$only_attack_these</i>.
+<p><dt>-O list <dd> Don't scan these hosts, domains or networks. Variable:
+<i>$dont_attack_these</i>.
+<p><dt>-s <dd> Enable subnet expansions. Variable:
+<i>$attack_proximate_subnets</i>.
+<p><dt>-S status_file <dd> SATAN status file (default <i>status_file</i>).
+Variable: <i>$status_file</i>.
+<p><dt>-t level <dd> Timeout length (0 = short, 1 = medium, 2 = long). Variable:
+<i>$timeout</i>.
+<p><dt>-v <dd> Turn on debugging output (to stdout). Variable: <i>$debug</i>.
+<p><dt>-V <dd> Print version number and terminate.
+<p><dt>-z <dd> Continue with attack level of zero when the level would become negative. The scan continues until
+the maximal proximity level is reached.
+<p><dt>-Z <dd> Opposite of the <i>-z</i> option.
+</dl>
+
+<p>
+<hr>
+<a href="satan_reference.html"> Back to the Reference TOC/Index</a>
+
+</BODY>
+</HTML>

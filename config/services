@@ -1,0 +1,78 @@
+
+tcpmux		1/tcp				# rfc-1078
+echo		7/tcp
+echo		7/udp
+discard		9/tcp		sink null
+discard		9/udp		sink null
+systat		11/tcp		users
+daytime		13/tcp
+daytime		13/udp
+netstat		15/tcp
+chargen		19/tcp		ttytst source
+chargen		19/udp		ttytst source
+ftp-data	20/tcp
+fsp		21/udp
+ftp		21/tcp
+telnet		23/tcp
+smtp		25/tcp		mail
+time		37/tcp		timserver
+time		37/udp		timserver
+name		42/udp		nameserver
+whois		43/tcp		nicname		# usually to sri-nic
+domain		53/tcp
+domain		53/udp
+tftp		69/udp
+gopher		70/tcp
+rje		77/tcp
+finger		79/tcp
+http		80/tcp
+link		87/tcp		ttylink
+supdup		95/tcp
+hostnames	101/tcp		hostname	# usually to sri-nic
+iso-tsap	102/tcp
+x400		103/tcp				# ISO Mail
+x400-snd	104/tcp
+csnet-ns	105/tcp
+pop-2		109/tcp				# Post Office
+sunrpc		111/tcp
+sunrpc		111/udp
+auth		113/tcp				# RFC931 identity protocol
+sftp            115/tcp
+uucp-path	117/tcp
+nntp            119/tcp         usenet		# Network News Transfer
+ntp		123/tcp				# Network Time Protocol
+netbios-ns      137/tcp    NETBIOS Name Service
+netbios-ns      137/udp    NETBIOS Name Service
+netbios-dgm     138/tcp    NETBIOS Datagram Service
+netbios-dgm     138/udp    NETBIOS Datagram Service
+netbios-ssn     139/tcp    NETBIOS Session Service
+netbios-ssn     139/udp    NETBIOS Session Service
+imap2           143/tcp
+NeWS		144/tcp		news		# Window System
+snmp            161/udp
+snmp-trap       162/udp         snmptrap
+xdmcp		177/udp
+biff		512/udp		comsat
+exec		512/tcp
+login		513/tcp
+who		513/udp		whod
+shell		514/tcp		cmd		# no passwords used
+syslog		514/udp
+printer		515/tcp		spooler		# line printer spooler
+talk		517/udp
+ntalk		518/udp
+route		520/udp		router routed
+courier		530/tcp		rpc		# experimental
+uucp		540/tcp		uucpd		# uucp daemon
+klogin          543/tcp                 # Kerberos rlogin
+kshell          544/tcp         krcmd   # Kerberos remote shell
+new-rwho	550/udp		new-who		# experimental
+rmonitor	560/udp		rmonitord	# experimental
+monitor		561/udp				# experimental
+pcserver	600/tcp				# ECD Integrated PC board srvr
+kerberos        750/tcp         kdc     # Kerberos (server) tcp
+kerberos        750/udp         kdc     # Kerberos (server) udp
+krbupdate       760/tcp         kreg    # Kerberos registration
+kpasswd         761/tcp         kpwd    # Kerberos "passwd"
+ingreslock      1524/tcp
+eklogin         2105/tcp                # Kerberos encrypted rlogin

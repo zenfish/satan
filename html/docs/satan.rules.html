@@ -1,0 +1,204 @@
+<HTML>
+<HEAD>
+<title>SATAN Rulesets </title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">SATAN Rulesets </H1>
+<HR>
+While not as potentially dangerous as the
+<a href="satan.cf.html">SATAN configuration file</a>, the collection of
+files that make up SATAN's internal rules are probably the most important
+part of the entire SATAN system.  All inferencing is done here; this is
+how SATAN determines, for instance, what the target's OS and hardware
+type is from the other data collected in the system.  Generally
+speaking, the rule files determine:
+<p>
+<UL>
+<li> What is dangerous/potentially harmful.
+<li> What is <STRONG>not</STRONG> dangerous.
+<li> What network services are being run.
+</UL>
+In addition, the rules also inform SATAN to run other probes based on
+past input; for instance, if the host is found to run <I>rexd</I>, then
+the <I>rexd.satan</I> probe might be run, based on a rule contained here.
+<p>
+The files are nothing more than perl code that gets run when the program
+initializes; don't be intimidated by that, however - it is fairly easy
+to read and is heavily commented (if you don't know perl, comments
+(lines that don't do anything) are lines that start with a sharp/pound
+sign ("#")).  Variables are tokens that start with a dollar sign; values
+of 0 or null ("") typically mean false, unless otherwise noted.
+<p>
+There are currently six (6) rule files, each governing a separate part
+of SATAN's behavior (note: <I>facts</I> contain information that individual
+SATAN data collection modules (e.g. the ".satan" files) collect.)
+<OL>
+<li> <a href="#drop">rules/drop</a> - determines what facts should be ignored.
+<li> <a href="#facts">rules/facts </a> - deduces new facts from existing data.
+<li> <a href="#hosttype"> rules/hosttype </a> - tries to recognize host
+types from telnet/ftp/smtp banners.
+
+<li> <a href="#services">rules/services </a> - classifies hosts by service type.
+<li> <a href="#todo">rules/todo </a> - specifies what probes to try next,
+given information gathered so far.
+<li> <a href="#trust">rules/trust </a> - classifies trust relationships.
+</OL>
+The easiest way to explain all of this is to just go over each file in
+turn.
+<p>
+
+<a name="drop"> <H3>rules/drop</H3></a>
+This contains rules that determine what facts should be ignored. Each
+rule is applied once for each SATAN record that has an "a" in the status
+field (this means the host is available; see the
+<a href="satan.db.html#Status">SATAN Data Base Format</a> section.)
+<p>
+For instance, SATAN assumes that CD-ROM drives are not harmful for
+export purposes; if we see a target host that exports <I>/cdrom</I>
+or <I>/CDROM</I>, we assume it's harmless by telling SATAN to ignore
+this fact:
+<PRE>
+    $text =~ /exports \/cdrom/i
+</PRE>
+(The <I>$text</I> variable holds the output of the SATAN probe,
+<I>showmount.satan</I> in this case; any of the global SATAN variables
+could be used.)
+<p>
+<a name="facts"><H3>rules/facts </H3></a>
+
+This file contains rules that deduce new facts from existing data.  Each
+rule is executed once for each SATAN record that has an "a" in the 
+status field. (this means the host is available; see the
+<a href="satan.db.html#Status">SATAN database format</a> section.)
+<p>
+The rule format is:
+<PRE>
+    condition TAB fact
+</PRE>
+(Note - the <I>TAB</I> is the tab character, not the three letters "T",
+"A", and "B"!)
+<p>
+For example, if we want to assume that if a host is running rexd it's
+insecure without trying to probe it further, we would put:
+<PRE>
+    /runs rexd/     $target|assert|a|us|ANY@$target|ANY@ANY|REXD access|rexd is vulnerable
+</PRE>
+The most difficult thing with the <I>rules/facts</I> file is that you
+have to understand the
+<a href="satan.db.html">SATAN data base format</a>; a good way to
+understand that better is to merely look at any of the <I>.satan</I>
+files in the main SATAN directory and look to see what the probe does
+and what it outputs.
+<p>
+
+<a name="hosttype"> <H3>rules/hosttype</H3> </a>
+This file contains rules that recognize host types from telnet/ftp/smtp
+banners; these are applied to every record that has a telnet, ftp, or
+sendmail banner.
+<p> The format of this file is:
+<PRE>
+    CLASS class_name
+    condition TAB hosttype
+</PRE>
+(Note - the <I>TAB</I> is the tab character, not the three letters "T",
+"A", and "B"!)
+<p>
+The class_name is used for the first rough breakdown by host type
+in reports. It should be a major software category, such as SUN,
+APOLLO, etc.  For example, here is the code for recognizing a SUN and
+its major OS revision:
+<PRE>
+    CLASS SUN
+    UNKNOWN && /SunOS/               "SunOS 4"
+    /4.1\/SMI-4.1/                   "SunOS 4"
+    /SMI-SVR4/                       "SunOS 5"
+</PRE>
+<p>
+While it looks fairly impenetrable, look at the examples given if you'd
+like to create your own rules and steal and modify the code we use to
+do this.
+<p>
+
+<a name="services"> <H3>rules/services</H3> </a>
+Very similar to the <a href="#hosttype">host type</a> ruleset, this file
+contains rules that translate the cryptic SATAN record data to something
+that is more suitable for reports.  Again, each
+rule is executed once for each SATAN record that has an "a" in the 
+status field. (this means the host is available; see the
+<a href="satan.db.html#Status">SATAN database format</a> section.)
+<p>
+Format of this file is:
+<PRE>
+    class_name
+    condition TAB service_name TAB host
+</PRE>
+Where the class_name is <I>SERVERS</I> or <I>CLIENTS</I>.  For instance,
+to classify a host as an NNTP server, you'd simply do this (in the
+<I>SERVERS</I> section):
+<PRE>
+    $service eq "nntp"               NNTP (Usenet news)
+</PRE>
+<p>
+<a name="todo"> <H3>rules/todo</H3> </a>
+These are rules that specify what probes to try next.  Each
+rule is executed once for each SATAN record that has an "a" in the 
+status field. (this means the host is available; see the
+<a href="satan.db.html#Status">SATAN database format</a> section.)
+<p>
+Format of this file is:
+<PRE>
+    condition TAB target tool tool-arguments
+</PRE>
+(Note - the <I>TAB</I> is the tab character, not the three letters "T",
+"A", and "B"!)
+<p>
+The condition is a logical expression (with the usual internal SATAN
+variables) that has to be satisfied in order for SATAN to run the probe
+specified; when the condition is satisfied, the tool is executed as:
+<PRE>
+    tool tool-arguments target
+</PRE>
+SATAN keeps track of already executed tool invocations.
+<p>
+For instance, if a host is running <I>ypserv</I>, we would
+typically run the <I>ypbind.satan</I> probe against it.  This would be
+done as follows:
+<PRE>
+    $service eq "ypserv"              $target "ypbind.satan"
+</PRE>
+<p>
+It's easy to put in a probe that, say, depends on the type of system
+that you're looking at.  For instance, SGI/IRIX hosts have <I>guest</I>,
+<I>lp</I>, and other accounts with no password when taken out-of-the-box
+from SGI.  Here's how you could check to see if this is a problem:
+<PRE>
+    /IRIX/                            $target "rsh.satan" "-u guest"
+</PRE>
+That would do an rsh as user guest to see if a command could be executed
+remotely; SATAN would then record this fact in the results.
+
+<a name="trust"> <H3>rules/trust</H3> </a>
+Similar to the host and service type rules, SATAN uses the trust rules
+to translate the cryptic SATAN record data to something
+that is more suitable for reports.  Again, each
+rule is executed once for each SATAN record that has an "a" in the 
+status field. (this means the host is available; see the
+<a href="satan.db.html#Status">SATAN database format</a> section.)
+<p>
+Format of this file is:
+<PRE>
+    condition TAB name of relationship
+</PRE>
+With the currrent <i>rules/trust</i> file, SATAN only begins to
+scratch the surface. It handles only the most easily detected
+forms of trust:
+<pre>
+    $severity eq "l"                        remote login
+    $text =~ /exports \S+ to/               file sharing
+    $text =~ / mounts \S+/                  file sharing
+</pre>
+<hr>
+<a href="satan_reference.html"> Back to the Reference TOC/Index</a>
+</BODY>
+</HTML>

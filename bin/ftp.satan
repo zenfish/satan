@@ -1,0 +1,68 @@
+#!/usr/local/bin/perl5
+
+# See if the target provides anonymous ftp, non-intrusive.
+
+require 'config/paths.pl';
+require 'config/satan.cf';
+require 'perl/misc.pl';
+require 'perllib/getopts.pl';
+
+$usage="Usage: $0 [-v] target";
+&Getopts("v") || die $usage;
+($#ARGV == 0) || die $usage;
+
+$target = $ARGV[0];
+
+$service = &basename($0, ".satan");
+
+open(FTP, "$FTP -nv <<EOF
+open $target
+quote user anonymous
+quote pass -satan\@
+cd /
+put /etc/group $$.foo
+dele $$.foo
+quit
+EOF |") || die "cannot run $FTP";
+while(<FTP>) {
+    if (defined($opt_v)) {
+	print;
+    }
+    if (/^230/) {
+	$status = "a";
+	$severity = "x";
+	$trustee = "";
+	$trusted = "";
+	$service_output = "ANONYMOUS";
+	$text = "offers anon ftp";
+	$texts{&satan_string()} = 1;
+   } elsif (/^226/) {
+	$severity = "nw";
+	$trustee = "~ftp@$target";
+	$trusted = "ANY\@ANY";
+	$service_output = "writable FTP home directory";
+	$text = "~ftp is writable";
+	$texts{&satan_string()} = 1;
+   } elsif (/^553/) {
+	$severity = "";
+	$trustee = "";
+	$trusted = "";
+	$service_output = "";
+	$text = "~ftp is not writable";
+	$texts{&satan_string()} = 1;
+   } elsif (/^530/) {
+	$status = "a";
+        $severity = "";
+        $trustee = "";
+        $trusted = "";
+        $service_output = "";
+	$text = "offers no anon ftp";
+	$texts{&satan_string()} = 1;
+    } elsif (/^Not connected/) {
+	exit 1;
+    }
+}
+
+foreach $key (keys %texts) {
+    print "$key\n";
+}

@@ -1,0 +1,112 @@
+#!/usr/local/bin/perl5
+#
+# version 3, Tue Apr  4  8:58:13 1995, last mod by wietse
+#
+
+$running_under_satan = 1;
+
+require 'config/version.pl';
+require 'config/satan.cf';
+require 'perl/satan-data.pl';
+require 'perl/run-satan.pl';
+require 'perl/misc.pl';
+require 'perllib/getopts.pl';	# IRIX needs it at the end.
+
+#
+# Defaults are taken from the config file. There are three ways to control
+# operation: from the command line, from the satan.cf file, and from the
+# HTML user interface. That's a bit much.
+#
+$opt_a = $attack_level;
+$opt_A = $proximity_descent;
+$opt_d = $satan_data;
+$opt_l = $max_proximity_level;
+$opt_o = $only_attack_these;
+$opt_O = $dont_attack_these;
+$opt_s = $attack_proximate_subnets;
+$opt_S = $status_file;
+$opt_t = 1;
+$opt_u = $untrusted_host;
+$opt_v = 0;
+$opt_z = $sub_zero_proximity;
+
+#
+# Parse JCL.
+#
+$usage = "usage: $0 [options] [targets...]
+
+Enters interactive mode when no target host is specified.
+
+-a		attack level (0=light, 1=normal, 2=heavy, default $opt_a)
+-A		proximity descent (default $opt_A)
+-c list		change variables (list format: \"name=value; name=value; ...\")
+-d database	data directory (default $opt_d)
+-i		ignore existing results
+-l proximity	maximal proximity level (default $opt_l)
+-o list		scan only these (default '$opt_o')
+-O list		stay away from these (default '$opt_O')
+-s		expand primary hosts to subnets
+-S status_file	pathname with scanning status file (default $opt_S)
+-t level	timeout (0 = short, 1 = medium, 2 = long, default $opt_t)
+-u		running from an untrusted host (for rsh/nfs tests)
+-U		running from a trusted host (for rsh/nfs tests)
+-v		turn on debugging output
+-V		print version number
+-z		when attack level becomes negative, continue at level 0
+-Z		stop at attack level 0
+";
+
+&Getopts("a:A:c:d:e:il:o:O:sS:t:uUvVzZ") || die $usage;
+
+if ($opt_V) {
+	print "SATAN version $satan_version\n";
+	exit 0;
+}
+
+# The power of PERL never stops to amaze me - Wietse
+for (split(/\s*;\s*/, $opt_c)) {
+	${$name} = $value if ($name, $value) = split(/\s*=\s*/, $_, 2);
+}
+
+print "SATAN is starting up....\n" if $#ARGV < 0;
+
+$debug = $opt_v;
+
+@all_attacks = (\@light, \@normal, \@heavy);
+die "bad attack level: $opt_a\n" unless $all_attacks[$opt_a];
+$attack_level = $opt_a;
+
+$satan_data = $opt_d;
+
+$max_proximity_level = $opt_l;
+$proximity_descent = $opt_A;
+$sub_zero_proximity = $opt_z;
+$sub_zero_proximity = 0 if $opt_Z;
+
+$only_attack_these = $opt_o;
+$dont_attack_these = $opt_O;
+
+$attack_proximate_subnets = $opt_s;
+$status_file = $opt_S;
+
+@all_timeouts = ($short_timeout, $med_timeout, $long_timeout);
+die "bad timeout: $opt_t\n" unless $all_timeouts[$opt_t];
+$timeout = $all_timeouts[$opt_t];
+
+$untrusted_host = $opt_u;
+$untrusted_host = 0 if $opt_U;
+
+umask 077;	# DON'T TAKE THIS OUT!!!
+
+if ($#ARGV < 0) {
+	#
+	# The HTML driver will eventually invoke init_satan() and run_satan().
+	#
+	require 'perl/html.pl';
+	&html();
+} else {
+	&init_satan_data();
+	&read_satan_data() unless defined($opt_i);
+	&run_satan(join(' ', @ARGV));
+}
+

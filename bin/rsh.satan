@@ -1,0 +1,78 @@
+#!/bin/sh
+#
+#  Does host trust us?  What is in hosts.equiv (probably a "+", if
+# this works...)  Should run as "root"
+#
+#  CHANGES TO BE DONE: do something with the output.
+#
+#
+# version 2, Sat Apr  8 21:02:49 1995, last mod by wietse
+#
+
+. config/paths.sh
+
+user=bin
+tmp_file="./tmp_file.$$"
+
+# arg stuff:
+while $TEST $# != 0
+        do      case "$1" in
+        -u)     user=$2 ; shift ;;
+        *)      target=$1
+        esac
+        shift
+        done
+
+if $TEST "X$target" = "X" ; then
+        $ECHO Usage $0 [-u user] target
+        exit 1
+        fi
+
+# used in final output
+# target=$1
+service=`$BASENAME $0 | $SED 's/\..*$//'`
+status="a"
+service_output=""
+
+
+# Check to see if we are who we should be -- bin or whatever:
+whoami=`$WHOAMI`
+
+if $TEST "$whoami" = "root" ; then
+	$RCMD $target $user "file /bin/sh" > $tmp_file 2> /dev/null
+else
+	# $ECHO Must be run as root
+	exit 2
+	fi
+
+if $GREP /bin/sh "$tmp_file" >/dev/null ; then
+	# do we want to put the output into a data file?
+	# $ECHO $target /etc/hosts.equiv file: `$CAT $tmp_file`
+	trustee="USER@$target"
+	service_output="remote shell access"
+	if $TEST $user = "bin" ; then
+		trusted="ANY@ANY"
+		text="rshd trusts the world"
+
+		# assume if you can get bin, a "+" in hosts.equiv, == root
+        	severity="rs"
+	else
+		trusted="$user@ANY"
+		text="user $user trusts the world"
+        	severity="us"
+		fi
+else
+	severity=""
+	trustee=""
+	trusted=""
+	service_output=""
+	text="doesn't trust the world"
+	fi
+
+$ECHO "$target|$service|$status|$severity|$trustee|$trusted|$service_output|$text"
+
+$RM -f $tmp_file
+
+exit 0
+
+# finis

@@ -1,0 +1,159 @@
+#
+# Rules that recognize host types from telnet/ftp/smtp banners. These are
+# applied to every telnet/ftp/sendmail record. Format of this file is:
+#
+#	CLASS class_name
+#	condition TABs hosttype
+#
+# Empty lines and text after a "#" character are ignored. Long lines may
+# be broken with backslash-newline.
+#
+# The class_name is used for the first rough breakdown by host type in,
+# for example, reports. It should be a major software category.
+# 
+# The condition is a PERL expression, with full access to the global
+# $target..$text variables; HOSTTYPE stands for the current hostname
+# info for the target host. UNKNOWN is true when the host type is unknown.
+#
+# The hosttype field is an expression that evaluates to a host type;
+# when it is absent, the value $1 is taken.
+#
+#
+# version 1, Sun Mar 26 18:39:56 1995, last mod by zen
+#
+
+#
+# Beware: AIX 3.x telnetd claims to be version 3.
+#
+CLASS AIX
+/(AIX [.0-9]+)/
+/AIX Version ([.0-9]+)/						"AIX $1"
+/AIX Version ([0-9]) / && length(HOSTTYPE) <= 3			"AIX $1"
+UNKNOWN && /(AIX)/
+
+#
+# Beware: Ultrix 4.x ftpd claims to be version 4.1.
+#
+CLASS Ultrix
+/ultrix[\/v ]+([.0-9]+[A-Z]*)/i					"Ultrix $1"
+/ultrix version 4/i && length(HOSTTYPE) <= 6			"Ultrix 4"
+UNKNOWN && /ultrix/i						"Ultrix"
+
+CLASS VMS
+/(VAX\/VMS)/
+/(OpenVMS)/
+UNKNOWN && /MultiNet/						"VAX/VMS"
+
+#
+# The first pattern is good for HP-UX 8.x and 9.x telnetd.
+#
+CLASS HP
+/(HP-UX) .+ ([AB1-7]\.[A-Za-z0-9.]+) /				"$1 $2"
+UNKNOWN && /(HP-UX)/
+UNKNOWN && /HP Sendmail/					"HP-UX"
+
+#
+# What about earlier IRIX versions?
+#
+CLASS SGI
+/IRIX System V.3/						"IRIX 4"
+/IRIX System V.4/						"IRIX 5"
+UNKNOWN && /\b(IRIX|SGI)\b/					"IRIX"
+
+#
+# SunOS 4.x ftpd and sendmail claim to be version 4.1
+# SunOS 5.x ftpd and telnetd claim to be generic SYSV40
+# SunOS 5.x will end up as "other" when they replaced sendmail
+#
+CLASS SUN
+UNKNOWN && /SunOS/						"SunOS 4"
+/4.1\/SMI-4.1/							"SunOS 4"
+/SMI-SVR4/							"SunOS 5"
+
+#
+# Domain/OS ftpd gives more specific version information than telnetd.
+#
+CLASS APOLLO
+/(Domain\/OS sr[.0-9]+)/ && length($1) > length(HOSTTYPE)
+UNKNOWN && /(Domain\/OS)/
+/Apollo/							"Domain/OS"
+
+#
+# Beware: NeXTStep 3.x ftp announces itself as NeXT 1.0.
+# Beware: NeXTStep 3.x sendmail announces itself as NX5.xx/NX3.0.
+#
+CLASS NEXT
+/NX.*\/NX([0-9]+)/						"NeXTStep $1"
+UNKNOWN && /(NeXT)/						"NeXTStep"
+
+#
+# Data General
+#
+CLASS DG/UX
+UNKNOWN && /\b(DG\/UX)\b/					$1
+/DG\/UX .* Release ([-\/A-Z0-9.]+)/				"DG/UX $1"
+
+#
+# Linux
+#
+CLASS LINUX
+UNKNOWN && /(Linux)/
+/(Linux [0-9.]+)/
+
+#
+# 4.4 BSD, BSDI, etc.
+#
+CLASS 4.4 BSD
+/(FreeBSD|NetBSD)/
+# e.g. BSDI BSD/386 1.1
+/(BSDI) BSD\/[0-9]+\s([0-9]+)/					"$1 $2"
+# e.g. BSDI BSD/OS 2.0
+/(BSDI) BSD\/OS\s([0-9]+)/					"$1 $2"
+
+#
+# Apple A/UX
+#
+CLASS A/UX
+/A\/UX.([.0-9]+)/						"A/UX $1"
+/(A\/UX)/
+
+#
+# Sequent slipped by us!
+CLASS Sequent
+/(DYNIX\/ptx)/
+/DYNIX\(R\) (V[.0-9]+)/						"DYNIX $1"
+/DYNIX/								"Sequent/DYNIX"
+
+#
+# Sony NEWS-OS
+CLASS SONY
+/NEWS-OS Release ([.0-9]+)/					"NEWS-OS $1"
+/(NEWS-OS)/
+
+#
+# Missed'em five
+#
+CLASS SYSTEM V
+UNKNOWN && /(System V) Release ([.0-9]+)/			"$1.$2"
+UNKNOWN && /(System V[.0-9]*)/
+
+#
+# Not really mainstream, but...
+#
+CLASS OSF
+/OSF\/([.0-9]+)/						"OSF $1"
+
+#
+# Some of these still need some refinement.
+#
+CLASS other
+/(Macintosh|ConvexOS)/
+/(Windows NT|OS\/2)/
+/VersaTerm/							"Macintosh"
+/(Codonics|APS-TI|Cray UNICOS)/
+/InfiniteStorage/						"Epoch"
+/(PC\/TCP)/
+/(NetWare|NEWT)\s*[Vv]*([.0-9]*)/				"$1 $2"
+/\b(CMC)\b/
+/(Epoch|RTU) /
+/(IBM VM|IBM MVS)/

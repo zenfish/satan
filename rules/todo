@@ -1,0 +1,72 @@
+#
+# Rules that specify what probes to try next. Each rule is applied once
+# to every 'a' SATAN record. Format of this file is:
+#
+#	condition TABs target tool tool-arguments
+#
+# Empty lines and text after a "#" character are ignored. Long lines may
+# be broken with backslash-newline.
+#
+# The condition is a PERL expression, with full access to the global
+# $target..$text variables and to everything else that has been found out
+# sofar. The target is the host that the tool is aimed at. A "*" before
+# the tool argument list is a hack that specifies that tool arguments
+# should be ignored when looking for duplicate tool invocations.
+#
+# When the condition is satisfied, the tool is executed as:
+#
+#	tool tool-arguments target
+#
+# The $junk variable is available for temporary results (wow!).
+#
+# The software keeps track of already executed tool invocations.
+#
+# version 2, Mon Mar 27 20:42:15 1995, last mod by wietse
+#
+
+#
+# Output from the rpcinfo probe. Tools will be executed only when
+# permitted by attack level constraints.
+#
+$service eq "mountd"			$target "showmount.satan"
+$service eq "mountd"			$target "nfs-chk.satan" "-t $short_timeout"
+$service eq "ypserv"			$target "ypbind.satan"
+$service eq "rexd"			$target "rex.satan"
+$service eq "rusersd"			$target "rusers.satan"
+
+#
+# Output from the finger or rusers probe: finger the origin of the login.
+#
+$severity eq "l" && "$trustee|$trusted" =~ /(.*)@.*@(.*)/ \
+					$2 "finger.satan" "-u $1"
+#
+# Output from the port scanners. Tools will be executed only when
+# permitted by the attack level constraints.
+#
+$service eq "ftp"			$target "ftp.satan"
+$untrusted_host && $service eq "shell"	$target "rsh.satan"
+$untrusted_host && $service eq "shell"	$target "rsh.satan" "-u root"
+$service eq "tftp"			$target "tftp.satan"
+$service =~ /X-([0-9]+)/		$target "xhost.satan" "-d $target:$1"
+
+#
+# Output from showmount. The "*" at the beginning of the tool argument
+# list is a hack that specifies that tool arguments should be ignored
+# when looking for duplicate tool invocations.
+#
+$trustee =~ /\/export\/root\/(.*)@(.*)/ && ($junk = &fix_hostname($1,$2)) ne ""\
+					$target "boot.satan" $junk
+
+#
+# Output from the bootparam probe gives us the NIS domain name. With
+# ypwhich we can ask the host who its NIS server is.
+#
+$service eq "boot" && $service_output =~ /domain (\S+)/ \
+					$target "ypbind.satan" "-d $1"
+$service eq "boot" && $service_output =~ /domain (\S+)/ \
+					$target "yp-chk.satan" "$1"
+#
+# Example of site specific rule; SGI's, for instance, have a "guest", "lp",
+# and other account with no password when out-of-the-box from SGI.  Here's
+# how you could check for this:
+$untrusted_host && /IRIX/		$target "rsh.satan" "-u guest"

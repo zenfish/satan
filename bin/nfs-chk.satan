@@ -1,0 +1,65 @@
+#!/usr/local/bin/perl5
+#
+# Report file systems that are exported via portmap or that can be mounted
+# by unpriviliged programs. World-mountable file systems are already taken
+# care of by showmount.satan.
+#
+# version 1, Mon Mar 20 18:48:11 1995, last mod by wietse
+#
+
+$running_under_satan = 1;
+require 'config/satan.cf';
+require 'config/paths.pl';
+require 'perl/misc.pl';
+require 'perl/hostname.pl';
+require 'perl/getfqdn.pl';
+require 'perllib/getopts.pl';
+
+$usage="Usage: $0 [-t timeout -u -v] target";
+$opt_u = $untrusted_host;
+&Getopts("t:uv") || die $usage;
+$timeout = $short_timeout;
+
+($#ARGV == 0) || die $usage;
+
+$target = $ARGV[0];
+$flags = "-v" if defined($opt_v);
+$timeout = $opt_t if defined($opt_t);
+$untrusted_host = $opt_u;
+
+$flags = "$flags -t $timeout" if defined($opt_t);
+
+$service = &basename($0, ".satan");
+$severity = "x";
+$status = "a";
+$service_output = "";
+
+$| = 1;
+
+open(NFS, "$NFS_CHK $flags $target |") || die "$0: cannot run nfs-chk";
+while(<NFS>) {
+	if (defined($opt_v)) {
+	    print;
+	}
+	if (/exports (\S+) via portmapper/) {
+		$trusted = "ANY\@ANY";
+		$trustee = "$1\@$target";
+		$service_output = "NFS export via portmapper";
+		$text = "exports $1 via portmapper";
+		&satan_print();
+	} elsif ($untrusted_host && /Mounted: (\S+) via mount daemon/) {
+		$trusted = "ANY\@ANY";
+		$trustee = "$1\@$target";
+		$service_output = "unrestricted NFS export";
+		$text = "exports $1 to everyone";
+		&satan_print();
+	} elsif (/exports (\S+) to unprivileged/) {
+		$this_host = &getfqdn(&hostname());
+		$trusted = "ANY\@$this_host";
+		$trustee = "$1\@$target";
+		$service_output = "NFS export to unprivileged programs";
+		$text = "exports $1 to unprivileged programs";
+		&satan_print();
+	}
+	# world-wide exports already taken care of in showmount.satan
+}

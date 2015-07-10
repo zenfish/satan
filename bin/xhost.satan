@@ -1,0 +1,42 @@
+#!/usr/local/bin/perl5
+#
+#  Query the target's X display and report whether or not it is vulnerable
+# to simple X attacks (keystroke grabbing, etc.)
+#
+# 
+require 'config/paths.pl';
+require 'perl/misc.pl';
+require 'perllib/getopts.pl';
+
+$usage = "Usage: $0 [-d display] [-v] target";
+&Getopts("d:v") || die $usage;
+($#ARGV ==  0) || die $usage;
+
+# used in final output
+$target = $ARGV[0];
+$display = defined($opt_d) ? $opt_d : "$target:0";
+$service = &basename($0, ".satan");
+$status = "a";
+
+# the actual program that does the work
+
+$command = "DISPLAY=$display $XHOST 2>/dev/null";
+print "$command\n" if $opt_v;
+open (XHOST, "$command|") || die "cannot run $XHOST";
+if (<XHOST> =~ /disabled/i) {
+	$severity = "us";
+	$trustee = "USER\@$target";
+	$trusted = "ANY\@ANY";
+	$service_output = "unrestricted X server access";
+	$text = "no X server access control";
+} else {
+	$severity = "";
+	$trustee = "";
+	$trusted = "";
+	$service_output = "";
+	$text = "X server isn't vulnerable";
+}
+
+&satan_print();
+
+# that's it...

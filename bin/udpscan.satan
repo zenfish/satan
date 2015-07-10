@@ -1,0 +1,49 @@
+#!/usr/local/bin/perl5
+#
+# version 1, Mon Mar 20 18:46:18 1995, last mod by wietse
+#
+
+#
+# Report UDP services.
+#
+require 'config/paths.pl';
+require 'perl/misc.pl';
+require 'perllib/getopts.pl';
+
+$usage = "usage $0 [-v] ports target";
+
+&Getopts("v") || die $usage;
+die $usage unless ($#ARGV == 1);
+
+($services = $ARGV[0]) =~ tr /,/ /;
+$target = $ARGV[1];
+
+$severity = "x";
+$status = "a";
+
+$| = 1; 
+
+open(SERVICES, $SERVICES) || die "$0: cannot open $SERVICES: $!\n";
+while (<SERVICES>) {
+	$service_name{$2} = $1 if /(\S+)\s+([0-9]+)\/udp/;
+}
+
+$command = "$UDP_SCAN $target $services";
+
+print "$command\n" if $opt_v;
+
+open(UDP_SCAN, "$command|")
+	|| die "$0: cannot run $UDP_SCAN";
+
+while(<UDP_SCAN>) {
+	if (defined($opt_v)) {
+	    print;
+	}
+	chop;
+	($port, $service) = split(/:/, $_);
+	$service = $service_name{$port} if $service_name{$port};
+	if ($service eq "UNKNOWN") { $service = "$port:UDP"; }
+	$service_output = "";
+	$text = "offers $service";
+	&satan_print();
+}

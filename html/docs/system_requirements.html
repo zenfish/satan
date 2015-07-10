@@ -1,0 +1,100 @@
+<HTML>
+<HEAD>
+<title>System Requirements</title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">System Requirements</H1>
+<HR>
+<P>
+Unfortunately SATAN isn't as portable as we would like it to be, but it
+still will run on a fairly large number of Un*x machines.  One
+of the main problems we had is that for it to do all of the tasks that
+we wanted and to actually be able to release it within any reasonable
+time frame, we had to both rely on many other publically available tools
+and forego much of our usual testing methodologies.  Still under
+development, and most often used by us as a research and discovery tool,
+it will become more robust and portable as we get feedback and are able
+to test it on more platforms ourselves.
+
+<A NAME="OS"><h3>Operating systems</h3></A>
+
+Currently SATAN is known to work on the following Operating Systems:
+<UL>
+<LI>SunOS 4.1.3_U1
+<LI>SunOS 5.3
+<LI>Irix 5.3
+</UL>
+
+<A NAME="Hardware"><h3>Hardware platforms</h3></A>
+
+SATAN has been tested with the following machines:
+
+<UL>
+<LI>SPARCstation 4/75
+<LI>SPARCstation 5
+<LI>Indigo 2
+</UL>
+However, it should run on quite a few more; try typing <i>make</i> for a
+list of the ones we think it'll work on (currently, this is
+AIX, BSD types, IRIX5, HP-UX 9.x, SunOS 4 & 5, SYSV-R4, Ultrix 4.x,
+and maybe, just maybe, with a bit of tweaking, Linux.)
+
+<A NAME="diskspace"><h3>Disk space</h3></A>
+
+Approximately 20 megabytes of total space is needed to install all of
+the supplementary packages and the SATAN program.  The bulk of this is
+due to the other software packages, chiefly Mosaic or netscape (5.5 MB or
+2.5 MB on a sun) and perl5 (10 MB); SATAN itself takes up about
+two megabytes of space, including the documentation.  If the
+supplementary programs are already installed, it isn't necessary to
+reinstall them.  If you use the binaries only, it can be as small as
+5 MB for a full installation.
+
+<A NAME="memory"><h3>Memory</h3></A>
+
+Memory is another issue - this is very dependent on how many hosts you're
+scanning in or are in your database, but rest assured, SATAN is a
+<STRONG>real</STRONG> pig when it comes to memory.  From our experiences:
+<p>
+With approximately 1500 hosts scanned, with approximately 18000 facts in the
+facts file took about 14 megabytes of memory on a SPARC 4/75 running
+SunOS 4.1.3.
+<p>
+With approximately 4700 hosts scanned, with about 150000 facts, it
+took up almost 35 megabytes of memory on an Indigo 2.
+<p>
+Needless to say, swapping is very painful if you don't have enough memory.
+<P>
+<A NAME="other-requirements">
+<h3>Other software tools required and where you can get them</h3></A>
+<p>
+ 
+We realize that you may not have all of the additional software required
+to run SATAN already on your system.  If you're not on the Internet,
+we're sorry but we currently do not have the resources to help you get
+all of these programs.  Perhaps at some point a tape or CD distribution
+could be made (probably by a 3rd party) if the demand is high enough.
+<p>
+Although all of it is widely and freely available on the Internet, on a
+wide number of sites, here are some easy places to find perl, mosaic,
+and netscape:
+<p>
+<a name="perl"></a>
+<a name="Mosaic"></a>
+<UL>
+<li> <a href="ftp://ftp.cis.ufl.edu/pub/perl/src/5.0/perl5.000.tar.gz">
+Perl, version 5.001</a></li>
+<li> <a href="ftp://ftp.ncsa.uiuc.edu/Mosaic/Unix">
+Mosaic, version 2.5</a></li>
+<li> <a href="ftp://ftp.netscape.com/netscape/unix">
+Netscape, version 1.0</a></li>
+</UL>
+
+<p>
+
+<hr>
+<a href="satan_overview.html"> Back to the Introductory TOC/Index</a>
+
+</BODY>
+</HTML>

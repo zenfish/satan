@@ -1,0 +1,63 @@
+#!/usr/local/bin/perl5
+#
+# Scan a subnet for live hosts
+#
+# If given IP address or hostname, scan everything on that subnet.
+# If given partial IP address (e.g. 140.174.97), do the same.
+#
+# Method used:
+#
+#  Use fping to scan the net; any hits send to gethostbyaddr to
+# get the hostname.  This will print out a list of hostname and/or
+# IP addresses that are alive, one per line.
+#
+
+require 'config/paths.pl';
+require 'perl/socket.pl';	# work around socket.ph problems
+
+$name = $ARGV[0];
+if (! $name) { die "Usage: $0 network-address\n"; }
+
+#
+# hostname?
+if ($name !~ /[0-9]+\.[0-9]+\.[0-9]+/) {
+	($name, $aliases, $type, $len, @ip) = gethostbyname($name);
+	($a,$b,$c,$d) = unpack('C4',$ip[0]);
+	$name = "$a.$b.$c";
+	}
+
+#
+# IP addr?  If four octets, chop off the last one
+if ($name =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) {
+	($name) = ($name =~ /^([0-9]+\.[0-9]+\.[0-9]+)\.[0-9]+/);
+	}
+
+# 3 octets of an ip address:
+if ($name =~ /^[0-9]+\.[0-9]+\.[0-9]+$/) {
+	for $i (1..255) { $args .= "$name.$i "; }
+	}
+else { die "Can't figure out what to scan ($name)\n"; }
+
+
+# spawn off fping, look at results
+die "Can't execute $FPING" unless open(FPING, "$FPING $args |");
+
+while (<FPING>) {
+	chop;
+	($target, $result) = /(\S+)\s+(.*)$/;
+	if ($_ =~ /is unreachable/) { next; }
+	if ($_ =~ /is alive/) {
+		($a,$b,$c,$d) = split(/\./, $target);
+		@ip = ($a,$b,$c,$d);
+		# Hack alert!! Some libcs dump when ahost has many addresses.
+		if (fork() == 0) {
+			($name) = gethostbyaddr(pack("C4", @ip), &AF_INET);
+			if ($name) { print "$name\n"; }
+			else { print "$target\n"; }
+			exit;
+			}
+		else { wait; }
+		}
+	}
+
+close(FPING);

@@ -1,0 +1,19 @@
+tcp_scan and udp_scan are tools to scan a host for available network
+services (for example, to see if your packet filter does its job). You
+can scan specific services or ranges of ports.  In order to speed up
+the process, the tools probe a bunch of network ports in parallel.
+
+The programs work with SunOS 4.1.3, SunOS 5.3 (Solaris 2.3) and
+probably with anything that looks like 4.3+ BSD or System V.4.
+
+There is one catch, though: the programs use raw ICMP sockets, so they
+need to be run with root privilege. Raw ICMP sockets are used to work
+around common shortcomings in BSD (75-second timeout on a non-blocking
+TCP connect() to an unreachable host) and in SYSV (a connected UDP
+socket does not pass delivery errors back to the application).
+
+Warning: these programs will raise lots of alarms on sites that run my
+tcp wrapper or that do any other kind of network monitoring.  Use the
+programs only with prior permission from the affected sites.
+
+	Wietse Venema

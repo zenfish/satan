@@ -1,0 +1,349 @@
+<HTML>
+<HEAD>
+<title>SATAN Architecture</title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">SATAN Architecture</H1>
+
+<hr>
+
+<h3><a name="general">Architecture Overview </a></h3>
+
+SATAN has an extensible architecture. At the center is a relatively
+small generic kernel that knows little to nothing about system types,
+network service names, vulnerabilities, or other details.  Knowledge
+about the details of network services, system types, etc. is built into
+small, dedicated, data collection tools and rule bases. The behaviour
+of SATAN is controlled from a configuration file. Settings may be
+overruled via command-line options of via a hypertext user interface.
+
+<p>
+
+The SATAN kernel consists of the following main parts:
+
+<dl>
+
+<p><dt><a href="#crypto-ignition>Magic cookie generator</a><dd> Each
+time SATAN is started up in interactive mode, the magic cookie generator
+generates a pseudorandom string that the HTML browser must send to the
+SATAN custom http server as part of all commands.
+
+<p><dt><a href="#policy-engine">Policy engine</a>. <dd>Given the
+constraints specified in the SATAN <a href="satan.cf.html">
+configuration file,</a> this subsystem determines whether a host may be
+scanned, and what <a href="#scanning-levels">scanning level</a> is
+appropriate for that host.
+
+<p><dt><a href="#target-acquisition">Target acquisition</a>. <dd>Given
+a list of target hosts, this SATAN subsystem generates a list of probes
+to be run on those hosts. The list of probes serves as input to the <a
+href="#data-acquisition">data acquisition</a> subsystem.
+
+The target acquisition module also keeps track of a host's <a
+href="#proximity-levels">proximity level</a>, and handles the
+so-called <a href="#subnet-scan">subnet expansions</a>.
+
+<p><dt><a href="#data-acquisition">Data acquisition</a>. <dd>Given a
+list of probes, this SATAN subsystem runs the corresponding data
+collection tools and generates new facts. These facts serve as input to
+the <a href="#inference-engine">inference engine</a>.
+
+<p><dt><a href="#inference-engine">Inference engine</a>. <dd>Given a
+list of facts, this subsystem generates new target hosts, new probes,
+and new facts.
+
+New target hosts serve as input to the <a href="#target-acquisition">
+target acquisition</a> subsystem; new probes are handled by the <a
+href="#data-acquisition">data acquisition</a> subsystem, and new facts
+are processed by the <a href="#inference-engine">inference engine</a>.
+
+<p><dt><a href="#report-analysis">Report and analysis</a>. <dd>This
+subsystem takes the collected data and builds a virtual hyperspace that
+you can explore with your favourite HTML browser.
+
+</dl>
+
+Once SATAN is given an initial target host, the target acquisition,
+data acquisition and inference engine subsystems keep feeding each
+other new data until nothing new comes up. Technically speaking, the
+system does a breadth-first search.
+
+<h3><a name="crypto-ignition">Magic cookie generator</a></h3>
+
+When you start SATAN in interactive mode, i.e., using the HTML user
+interface, SATAN performs the following actions before starting up
+the HTML browser:
+
+<ul> 
+
+<p><li>Start the SATAN httpd daemon.  This is a very limited subset of the
+typical httpd daemon, sufficient to support all activities that SATAN
+can perform.
+
+<p><li>Generate a (hopefully "good") 32 byte cryptographic magic cookie for
+the upcoming SATAN run.  SATAN runs several system utilities in
+parallel and compresses their quasi-random output with the MD5 hashing
+function.  The HTML browser must specify this magic cookie as part of
+the URLs that it sends to the custom SATAN httpd daemon.  If this key
+is ever compromised, intruders could potentially execute any programs
+that the SATAN program can run, with the same privileges as the user
+that started the SATAN program. SATAN generates a new magic cookie for
+each session. SATAN and the HTML browser always run on the same host,
+so there is no need to send the magic cookie over the network.
+
+<p><li>Read in any previously collected scan data.  By default, SATAN will
+read data in the <i>$satan_data</i> database.  In the mean time HTML
+browser comes up, but it will not be ale to communicate with SATAN
+until the database has been read in.  This can take anywhere from a few
+seconds to several minutes, depending on the size of the database, the
+speed of the machine you're using to run SATAN on, the amount of
+available RAM, etc.
+
+</ul>
+
+<h3><a name="policy-engine">Policy engine</a></h3>
+
+The policy engine controls what hosts SATAN may probe.  The probing
+intensity depends on the host's <a href="#proximity-levels">proximity
+level</a>, which is basically a measure for the distance from the
+initial target host(s). Probing intensities and probing constraints are
+specified in the <a href="satan.cf.html">configuration file</a>.  This
+file can direct SATAN to stay within certain internet domains, or to
+stay away from specific internet domains.
+
+<p>
+
+<h3><a name="proximity-levels"> Proximity levels </a></h3>
+
+<p>
+
+While SATAN gathers information from the so-called <i>primary</i>
+target(s) that you specified, the program may learn about the existence
+of other hosts. Examples of such <i>non-primary</i> systems are:
+
+<ul>
+
+<li>hosts found in remote login information from the <i>finger</i>
+service,
+
+<li>hosts that import file systems from the target, according to the
+<i>showmount</i> command.
+
+</ul>
+
+For each host, SATAN maintains a proximity count. The proximity of a
+primary host is zero; for hosts that SATAN finds while probing a
+primary host, the proximity is one, and so on.  By default, SATAN stays
+away from hosts with non-zero proximity, but you can override this
+policy by editing the <a href="satan.cf.html">configuration file,</a>
+via command-line switches, or from the hypertext user interface.
+
+<h3><a name="target-acquisition">Target acquisition</a></h3>
+
+SATAN can gather data about just one host, or it can gather data about
+all hosts within a subnet (a block of 256 adjacent network addresses).
+The latter process is called a <a href="#subnet-scan">subnet scan
+</a>.  Target hosts may be specified by the user, or may be generated
+by the <a href="#inference-engine">inference engine</a> when it
+processes facts that were generated by the <a href="#data-acquisition">
+data acquisition</a> module.
+
+<p>
+
+Once a list of targets is available, the target acquisition module
+generates a list of probes, according to the <a
+href="#scanning-levels">scanning level</a> derived by the <a
+href="#policy-engine">policy engine</a>.  The actual data collection is
+done under control of the <a href="#data-acquisition">data
+acquisition</a> module.
+
+<h3><a name="subnet-scan">Subnet scan</a></h3>
+
+When requested to scan all hosts in a subnet (a block of 256 internet
+addresses), SATAN uses the <i>fping</i> utility to find out what
+hosts in that subnet actually are available.  This is to avoid wasting
+time talking to hosts that no longer exist or that happen to be down at
+the time of the measurement. The <i>fping</i> scan also may discover
+unregistered systems that have been attached to the network without
+permission from the network administrator.
+
+<h3><a name="data-acquisition">Data acquisition</a></h3>
+
+The data acquisition engine takes a list of probes and executes each
+probe, after it has verified that the probe may be run at the target's
+<a href="#scanning-levels">scanning level</a>. What tool may be run at
+a given scanning level is specified in the <a
+href="satan.cf.html">configuration file</a>.  The software keeps a
+record of what probes it has already executed, to avoid doing
+unnecessary work. The result of data acquisition is a list of new facts
+that is processed by the <a href="#inference-engine">inference engine</a>.
+
+<p>
+
+SATAN comes with a multitude of little tools.  Each tool implements one
+type of network probe. By convention, the name of a data collection
+tool ends in <i>.satan</i>. Often these tools are just a few lines of
+PERL or shell script language.  All tools produce output according to
+the same common <a href="satan.db.html">tool record format.</a>
+SATAN derives a great deal of power from this toolbox approach. When a
+new network feature becomes of interest, it is relatively easy to <a
+href="satan.probes.html">add your own probe</a>.
+
+<h3><a name="scanning-levels">Scanning levels</a></h3>
+
+SATAN can probe hosts at various levels of intensity. The scanning
+level is controlled with the <a href="satan.cf.html">configuration
+file</a>, but can be overruled with command-line switches or via the
+graphical user interface.
+
+<dl>
+
+<p><dt>light
+
+<dd>This is the least intrusive scan. SATAN collects information from
+the DNS (Domain Name System), tries to establish what RPC (Remote
+Procedure Call) services the host offers, and what file systems it
+shares via the network.  With this information, SATAN finds out the
+general character of a host (file server, diskless workstation).
+
+<p><dt>normal (includes <i>light</i> scan probes)
+
+<dd>At this level, SATAN probes for the presence of common network
+services such as finger, remote login, ftp, WWW, Gopher, email and a
+few others.  With this information, SATAN establishes the operating
+system type and, where possible, the software release version.
+
+<p><dt>heavy (includes <i>normal</i> scan probes)
+
+<dd>After it has found out what services the target offers, SATAN looks
+at them in more depth, and does a more exhaustive scan for network
+services offered by the target. At this scanning level SATAN finds out
+if the anonymous FTP directory is writable, if the X Windows server has
+its access control disabled, if there is a wildcard in the <i>
+/etc/hosts.equiv </i>file, and so on.
+
+</dl>
+
+The fourth level, breaking into systems, has not been implemented.
+
+<p>
+
+At each level SATAN may discover that critical access controls are
+missing or defective, or that the host is running a particular software
+version that is known to have problems. SATAN takes a conservative
+approach and does not exploit the problem.
+
+<h3><a name="inference-engine">Inference engine</a></h3>
+
+The heart of SATAN is a collection of little inference engines. Each
+engine is controlled by its own rule base. The rules are applied in
+real time, while data is being collected.  The result of these
+inferences are lists of new facts for the inference engine, new probes
+for the <a href="#data-acquisition">data acquisition engine</a>, or new
+targets for the <a href="#target-acquisition">target acquisition </a>
+engine.
+
+<dl>
+
+<p><dt><a href="satan.rules.html#todo">rules/todo</a>
+
+<dd>Rules that decide what probe to perform next.  For example, when
+the target host offers the FTP service, and when the target is being
+scanned at a sufficient level, SATAN will attempt to determine if the
+host runs anonymous FTP, and if the FTP home directory is writable for
+anonymous users.
+
+<p><dt><a href="satan.rules.html#hosttype">rules/hosttype</a>
+
+<dd>Rules that deduce the system class (example: DEC HP SUN) and, where
+possible, the operating system release version, from telnet, ftp and
+other banners.
+
+<p><dt><a href="satan.rules.html#facts">rules/facts</a>
+
+<dd>Rules that deduce potential vulnerabilities. For example, several
+versions of the FTP or sendmail daemons are known to have problems.
+Daemon versions can be recognized by their greeting banners.
+
+<p><dt><a href="satan.rules.html#services">rules/services</a>
+
+<dd>Rules that translate cryptic daemon banners and/or network port
+numbers to more user-friendly names such as <i>WWW server,</i> or
+<i>diskless NFS client</i>.
+
+<p><dt><a href="satan.rules.html#trust">rules/trust</a>
+
+<dd>Like the services rules, these rules help SATAN to classify the
+data that was collected by the tools on NFS service, DNS, NIS, and
+other cases of trust.
+
+<p><dt><a href="satan.rules.html#drop">rules/drop</a>
+
+<dd>What data-collection tool output SATAN should ignore. This can be
+used to shut up SATAN about things that you do not care about.
+Implemented by the <i>drop_fact.pl</i> module.
+
+</dl>
+
+Application of these rules in real time, to each tool output record,
+and within the context of all information that has been collected
+sofar, offers an amazing potential that we are only beginning to
+understand.
+
+<h3><a name="report-analysis">Report and Analysis</a></h3>
+
+When SATAN scans a network with hundreds or thousands of hosts, it can
+collect a tremendous amount of information.  As we have found, it does
+not make much sense to simply present all that information as huge
+tables. You need the power of hypertext technology, combined with some
+unusual implementation techniques to generate a dynamic hyperspace on
+the fly.
+
+<p>
+
+With a minimal amount of effort (at least, by you; your computer may
+disagree), SATAN allows you to navigate though your networks. You can
+break down the information according to:
+
+<ul>
+
+<li>Domain or subnet,
+
+<li>Network service,
+
+<li>System type or operating system release,
+
+<li>Trust relationships,
+
+<li>Vulnerability type, danger level, or count.
+
+</ul>
+
+Breakdowns by combinations of these properties are also possible.
+SATAN's reporting capabilities makes it relatively easy to find out,
+for example:
+
+<ul>
+
+<li>What subnets have diskless workstations,
+
+<li>What hosts offer anonymous FTP,
+
+<li>Who runs Linux or FreeBSD on their PC,
+
+<li>What unregistered (no DNS hostname) hosts are attached to your network.
+
+</ul>
+
+<p>
+
+Questions like these can be answered with only a few mouse clicks.
+Printing a report is a matter of pressing the <i>print</i> button of
+your favourite hypertext viewer.
+
+<hr>
+<a href="satan_reference.html"> Back to the Reference TOC/Index</a>
+
+</BODY>
+</HTML>

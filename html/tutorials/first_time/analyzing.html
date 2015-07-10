@@ -1,0 +1,54 @@
+<title>Analyzing SATAN output</title>
+<H1><IMG SRC="../../images/satan.gif"> Analyzing SATAN output</H1>
+<HR>
+<p>
+Learning how to effectively interpret the results of a SATAN scan is
+the most difficult part about using SATAN.  This is partly because 
+there is no "correct" security level.  "Good" security is very much
+dependent on the policies and concerns of the site or system involved.
+<p>
+In addition, some of the concepts used in SATAN (such as why trust
+and network information can be so damaging) and many of the options
+that can be chosen (like proximity, proximity descent, attack filters,
+etc.) will not be very familiar to many system administrators.  It
+is important to read and understand the documentation to use the tool
+effectively.
+<p>
+In the reports if there is a host listed with a red dot
+(<IMG SRC="../../dots/reddot.gif">) next to it, that means the
+host has a vulnerability that could compromise it.  A black dot
+(<IMG SRC="../../dots/blackdot.gif">) means that no vulnerabilites
+have been found for that particular host yet.  Clicking on hyperlinks
+will give you more information on that host, network, piece of
+information, or vulnerability, just as expected.
+<p>
+From the control panel in the HTML interface, select
+<I>SATAN Reporting & Data Analysis</I>.  You will then be
+prompted with a wealth of choices; when first learning to use
+the tool, the <I>Vulnerabilities</I> section will probably
+be the one of the most immediate interest.  In that section,
+the <I>By Approximate Danger Level</I> link is a good place
+to start.  If you find no warnings there, congratulations!  Note
+that this does <U>NOT</U> mean that your host is secure - it
+simply means that SATAN could not find any problems.  You
+might try scanning your targets at a higher level and check this
+again; in any case, you should investigate the other categories
+(Hosts and Trust) in the reporting page.
+<p>
+The best way to learn what SATAN can do for you is by using it - 
+scanning networks and examining the results with the Report and
+Analysis tools can reveal interesting things about your network.
+Remember, anyone has access to this informtion, so act accordingly!
+<p>
+Reading, or at least browsing through the full documentation is
+strongly recommended - this tutorial merely covered the very basic
+capabilities of SATAN.  There are a wealth of possible options that
+can be used to unleash SATAN's full potential.  Be careful, however,
+because it is easy to unwittingly make your neighbors think that you're
+trying to attack them with the scans - <U>always</U> be certain that
+you have permission to scan any potential hosts that you're thinking
+of testing.
+
+<hr>
+<a href=../../satan_documentation.html> Back to the SATAN Documentation Index</a>
+

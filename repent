@@ -1,0 +1,40 @@
+:
+#
+# Change SATAN to SANTA.  Do this *before* you type make...
+#
+# version 1, Fri Mar 24  2:25:29 1995, last mod by zen
+#
+
+# if we see an md5 file, we'll assume they have already done a make...
+if test -f bin/md5 ; then
+	echo Run this before doing a \"make\", or run \"make clean\" and then run it...
+	exit 1
+	fi
+
+#
+# Change the file names from "*satan*" ==> "*santa*"
+echo Finding all the file names
+find . \! -name "satan*.gif" -print | while read old_name
+	do
+	new_name=`echo $old_name | sed 's/satan/santa/'`
+	if test $new_name != $old_name ; then
+		mv $old_name $new_name
+		fi
+	done
+
+#
+# Nuke the inline and acronym stuff in everything but the binaries...
+echo Now changing all "SATAN" occurances to "SANTA"... please wait...
+find . -type f \! -name "*.gif" -print |
+	grep -v see_the_light.pl | xargs \
+	perl -pi -e 's/SATAN/SANTA/g; s/satan/santa/g; s/Security Administrator Tool for Analyzing Networks/Security Analysis Network Tool for Administrators/'
+
+echo linking santa...
+ln html/images/santa.gif html/images/santa-almost-full.gif
+ln html/images/santa.gif html/images/santa-full.gif
+
+#
+# one last switch...
+perl -pi -e 's/"SANTA"/"SATAN"/; s/you can run the/but you shouldnt have run the/' html/name.html
+
+echo Done!

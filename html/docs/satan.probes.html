@@ -1,0 +1,83 @@
+<HTML>
+<HEAD>
+<title>Extending SATAN </title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">Extending SATAN</H1>
+<HR>
+One of the best parts of SATAN is that it is so easy to modify, configure,
+and add your own probes and vulnerability checks to the system.
+All of the probes are files that end in <I>.satan</I> and are kept
+in the <i>bin</i> subdirectory; the rules to add new vulnerability
+checks are in the <I>rules</I> subdirectory (see the section on
+<a href="satan.rules.html">satan rules</a> for more information on
+the rulesets.)  SATAN tests for vulnerabilities are roughly done as follows:
+<UL>
+<li> Initial data collection, via <i>.satan</i> files.  Save this info into
+the database (ASCII text files).  This will be either informational or
+vulnerability data.
+<li> When the user fires up the HTML browser, SATAN examines the database
+for explicit vulnerabilities, then checks the rulesets to see if it can
+infer other vulnerabilities (such as finding an old sendmail version or
+something.)
+</UL>
+If you want to add another <I>.satan</I> test - perhaps checking for
+the latest sendmail bug or something - there are a few things
+that must be done, depending on your test:
+
+<OL>
+<li> Create an executable that checks for the problem you'd like to scan
+for.  It generally will take one argument - a hostname that is the
+target of the probe.
+
+<li> Have the probe output a valid SATAN output record - see the
+<A HREF="satan.db.html">SATAN database format</A> document for more on
+this.
+
+<li> If it is a C program or something that must be processed or
+compiled before being run, either modify an existing SATAN makefile to
+do so, or create your own.
+
+<li> Decide what severity level it will be run at; either <I>light</I>,
+<I>normal</I>, or <I>heavy</I>, and modify the appropriate variable
+in the <A HREF="satan.cf.html#attack-level">satan.cf</A> file.
+
+</OL>
+
+If you want to modify the rulesets, see the 
+<a href="satan.rules.html">satan rules</a> section to see how to 
+create a rule that will check for a vulnerability.
+<p>
+Finally, you'll want to create an information file (we call them tutorials.)
+This explains the vulnerability, tells how to fix or otherwise deal with
+the problem, points to applicable CERT or vendor advisories, etc.  There
+are examples of these in the <i>html/tutorials/vulnerabilities</i>
+subdirectory.
+<p>
+<strong>Important!</strong>  Look at the canonical output of the tool (see the
+<a href="satan.db.html#Canonical">satan database</a> for more details on
+this) - for instance, for REXD, it's <strong>"REXD access"</strong>.
+<p>
+The filename will be identical to the canonical output, with underbars
+<i>("_")</i> instead of spaces, with an <i>".html"</i> suffix.  E.g.,
+for REXD, the filename is <strong>REXD_access.html</strong>.
+<p>
+That's it!  Place the executable (or have <I>make</I> do so after
+processing the source file) in the <i>bin</i> SATAN subdirectory with
+the rest of the <I>.satan</I> files.  It will be run against any target
+that has an attack level that corresponds to your probe.
+
+<hr>
+If you're feeling really womanly or manly, and want to give your news
+tests or changes to the world, the best thing to do is to generate a
+patch using the diff command that can be run against the latest released
+version of SATAN.  Feel free to send it to:
+<p>
+<ADDRESS>satan@fish.com</ADDRESS>
+
+<hr>
+<a href="satan_reference.html"> Back to the Reference TOC/Index</a>
+
+</BODY>
+</HTML>

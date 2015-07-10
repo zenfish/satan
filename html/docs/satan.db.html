@@ -1,0 +1,147 @@
+<HTML>
+<HEAD>
+<title>SATAN Database Format</title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">SATAN Database Format</H1>
+<HR>
+
+There are three main databases in SATAN:
+<UL>
+<LI><A HREF="#facts"><strong>facts</strong> - just the facts, m'am</a>
+<LI><A HREF="#all-hosts"><strong>all-hosts</strong> - all the hosts seen</A>
+<LI><A HREF="#todo"><strong>todo</strong> - all the things it did </a>
+</UL>
+
+
+<A name="facts"></a><H2>The "facts" database</H2>
+All information is in the form of text records with attributes
+described below; there are seven fields, each separated by a pipe
+("|") character.
+<p>
+This information is what is collected by SATAN's dumb data collection
+tools - no intelligence used, they just do what they're told to do.
+<p>
+Inferences and conclusions are in the same format; the fields are:
+<OL>
+<LI> <A HREF="#Target">Target</A>
+<LI> <A HREF="#Service">Service</A>
+<LI> <A HREF="#Status">Status</A>
+<LI> <A HREF="#Severity">Severity</A>
+<LI> <A HREF="#Trusted">Trusted</A>
+<LI> <A HREF="#Trustee">Trustee</A>
+<LI> <A HREF="#Canonical">Canonical Service Output</A>
+<LI> <A HREF="#Text">Text</A>
+</OL>
+
+<A NAME="Target"><H3>Target</H3></A>
+
+Name of host that the record refers to.  In order of preference,
+it uses FQDN, IP, estimated, or partial.  Partial can result from
+service output getting truncated; e.g. finger can return
+<I>"foo.bar.co"</I>; is that <I>"foo.bar.com"</I>, or something
+longer?  SATAN tries to figure this out, but obviously can't always be
+right.
+
+<A NAME="Service"><H3>Service</H3></A>
+
+The basename of tool, with the <I>".satan"</I> suffix removed.
+In the case of tools that probe multiple services (such as 
+<em>rpcinfo</em> or the portscanner), the name of the service being
+probed.
+
+<A NAME="Status"><H3>Status</H3></A>
+
+This tells us if the host was reachable, if it timed out, or whatever.
+The codes and what they mean are:
+<OL>
+<LI><I>a</I>: <STRONG>available</STRONG>
+<LI><I>u</I>: <STRONG>unavailable (e.g. timeout)</STRONG>
+<LI><I>b</I>: <STRONG>bad (e.g. unable to resolve)</STRONG>
+<LI><I>x</I>: <STRONG>look into further?</STRONG>
+</OL>
+
+<A NAME="Severity"><H3>Severity</H3></A>
+
+How serious was the vulnerability?  The codes are:
+<OL>
+<LI> <I>rs</I>: <STRONG>host</STRONG> or <STRONG>root</STRONG> access to the target.
+<LI> <I>us</I>: <STRONG>user shell access</STRONG>
+<LI> <I>ns</I>: <STRONG>nobody shell access</STRONG>
+<LI> <I>uw</I>: <STRONG>user file write</STRONG>
+<LI> <I>nr</I>: <STRONG>nobody file read</STRONG>
+</OL>
+
+<A NAME="Trustee"><H3>Trustee</H3></A>
+
+This is who trusts another target.  It is denoted by two tokens separated
+by an at sign (<I>"@"</I>).  The left part is the user :
+<OL>
+<LI> <I>user</I>: <STRONG> a particular user on the host is trusted</STRONG>
+<LI> <I>root</I>: <STRONG> only root is trusted</STRONG>
+<LI> <I>nobody</I>: <STRONG> user nobody on the host is trusted</STRONG>
+<LI> <I>ANY</I>: <STRONG> any arbitrary user on the host is trusted</STRONG>
+</OL>
+The right part of the trust field is the host that is trusted - it is
+either the <I>target</I> or <I>ANY</I>, which refers to any host on
+the Internet.
+<p>
+<A NAME="Trusted"><STRONG>Trusted</STRONG></A>
+This is who is the <I>trustee</I> trusts.  It is denoted by two tokens
+separated by an at sign (<I>"@"</I>), and it uses the same format the
+the <A HREF="#Trustee"><I>"trustee"</I></A> field.
+
+<A NAME="Canonical"><H3>Canonical Service Output</H3></A>
+
+In the case of non-vulnerability records,
+this is a reformatted version of the network service; the format is
+either <I>"user name, home dir, last login"</I> or
+<I>"filesys, clients"</I>. 
+In the case of vulnerability records, this is a description of the
+problem type. SATAN uses this name in reports by vulnerability type,
+and uses it to locate the corresponding vulnerability tutorial.
+
+<A NAME="Text"><H3>Text</H3></A>
+
+This is a place to put english (or other languages)-like messages
+that can be outputted in the final report.
+</OL>
+
+
+<A name="all-hosts"><H2>"all-hosts" - all the hosts seen database</h2></A>
+The <i>all-hosts</i> database keeps track of what hosts SATAN has seen, in
+any way, shape, or form, while scanning networks, including hosts that
+may or may not exist.  (Non-existant hosts might include, for instance,
+hosts reported from the output of the <i>showmount</i> command.
+The database is an ASCII file, with six (6) fields separated by a
+pipe ("|") character, whose attributes are:
+<ul>
+<li>IP address of the host
+<li>The proximity level from the original target
+<li>The attack level the host has been probed with
+<li>Was subnet expansion on?  (1 = yes, 0 = no)
+<li>What time was the scan done?
+</ul>
+(See the <a href="satan.cf.html">SATAN configuration file</a> documentation
+for more information on these variables and concepts.)
+
+<A name="todo"><H2>"todo" - database that tracks probes already done</h2></a>
+<p>
+The <i>todo</i> database keeps track of what probes have already been done.
+It's in the form of text records with attributes described below;
+there are three fields, each separated by a pipe ("|") character:
+
+<ul>
+<li>The hostname
+<li>The name of the tool that is to be run next
+<li>Any arguments for the tool
+</ul>
+The tools perform <i>.satan</i> probes against the <i>hostname</i> with
+the arguments, if any.
+
+<hr>
+<a href="satan_reference.html"> Back to the Reference TOC/Index</a>
+
+</BODY>
+</HTML>

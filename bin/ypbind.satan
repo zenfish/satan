@@ -1,0 +1,73 @@
+#!/usr/local/bin/perl5
+
+# Try to identify a host's NIS domain name and NIS server by trying out a
+# series of NIS domain name guesses. When the number of guesses becomes
+# sufficiently large (say, several tens when the network is fast) the
+# remote ypbind daemon may fall behind so far that it runs out of file
+# descriptors.  This can be fixed by inserting sleep() calls.
+
+$running_under_satan = 1;
+
+require 'config/paths.pl';
+require 'perl/fix_hostname.pl';
+require 'perl/misc.pl';
+require 'perllib/getopts.pl';
+
+#
+# Do JCL stuff.
+#
+$usage="Usage: $0 target [hints]\n";
+&Getopts("d:v");
+
+if ($#ARGV < 0) {
+    print STDERR $usage;
+    exit 1;
+}
+$target = $ARGV[0];
+$service = &basename($0, ".satan");
+$status = "a";
+
+# Iterate over all hints. For each hint, try the hint itself, then all
+# results from breaking it up at successive dots. We use an associative
+# array to weed out duplicate guesses.
+#
+if ($opt_d) {
+    $guesses{$opt_d} = 0;
+} else {
+    foreach $i (1..$#ARGV, 0) {
+	$hint = $ARGV[$i];
+	$guesses{$hint} = 0;
+	for ($dot = rindex($hint,"."); $dot >= $[; $dot = rindex($head,".")) {
+	    $head = substr($hint, $[, $dot - $[);
+	    $guesses{$head} = 0;
+	    $tail = substr($hint, $dot + 1);
+	    $guesses{$tail} = 0;
+	}
+    }
+}
+
+foreach $guess (keys %guesses) {
+    if (defined($opt_v)) {
+	print STDERR "ypbind.satan: trying: $guess\n";
+    }
+    open (YPWHICH, "$YPWHICH -d $guess $target 2>/dev/null|") 
+	|| exit 1;
+    while (<YPWHICH>) {
+	chop;
+	$nis_server = &fix_hostname(&get_host_name($_), $target);
+	$severity = "x";
+	$trusted = "root\@$nis_server";
+	$trustee = "root\@$target";
+	$service_output = "$guess $nis_server";
+	$text = "$nis_server serves nis domain $guess for $target";
+	&satan_print();
+	exit;
+    }
+    close (YPWHICH);
+}
+
+# All out guesses failed.
+
+$text = "unable to guess nis domain name of $target";
+&satan_print();
+exit;

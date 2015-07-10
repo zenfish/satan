@@ -1,0 +1,54 @@
+#!/usr/local/bin/perl5
+#
+# Query the NIS server.
+#
+
+$running_under_satan = 1;
+require 'config/satan.cf';
+require 'config/paths.pl';
+require 'perl/misc.pl';
+require 'perl/hostname.pl';
+require 'perl/getfqdn.pl';
+require 'perllib/getopts.pl';
+
+$usage="Usage: $0 [-t timeout -u -v] domain target\n";
+$opt_u = $untrusted_host;
+&Getopts("t:uv") || die $usage;
+$timeout = $short_timeout;
+
+($#ARGV == 1) || die $usage;
+
+$domain = $ARGV[0];
+$target = $ARGV[1];
+$flags = "-v" if defined($opt_v);
+$timeout = $opt_t if defined($opt_t);
+$untrusted_host = $opt_u;
+
+$flags = "$flags -t $timeout";
+
+$service = &basename($0, ".satan");
+$severity = "x";
+$status = "a";
+$service_output = "";
+
+$| = 1;
+
+$command = "$YP_CHK $flags $domain passwd.byname $target";
+
+print "$command\n" if $opt_v;
+
+open(YP, "$command |") || die "$0: cannot run yp-chk";
+while(<YP>) {
+	if (defined($opt_v)) {
+	    print;
+	}
+	if ($untrusted_host && /:.*:.*:.*:.*:.*:/) {
+		$trusted = "ANY\@ANY";
+		$severity = "us";
+		$trustee = "user\@$target";
+		$service_output = "NIS password file access";
+		$text = $service_output;
+		&satan_print();
+	}
+	# Other NIS problems later.
+}

@@ -1,0 +1,179 @@
+.TH SATAN 8
+.SH NAME
+satan \- network security scanner
+.SH SYNOPSIS
+.B satan
+.I [options] [primary_target(s)...]
+.SH DESCRIPTION
+.B SATAN
+(Security Administrator Tool for Analyzing Networks) remotely probes
+systems via the network and stores its findings in a database. The
+results can be viewed with any Level 2 HTML browser that supports the
+.I http
+protocol (e.g.
+.B Mosaic, Netscape,
+etc.)
+.PP
+When no
+.I primary_target(s)
+are specified on the command line,
+.B SATAN
+starts up in interactive mode and takes commands from the HTML user
+interface.
+.PP
+When
+.I primary_target(s)
+are specified on the command line,
+.B SATAN
+collects data from the named hosts, and, possibly, from hosts that it
+discovers while probing a primary host. A primary target can be a host
+name, a host address, or a network number. In the latter case,
+.B SATAN
+collects data from each host in the named network.
+.PP
+.B SATAN
+can generate reports of hosts by type, service, vulnerability and by
+trust relationship. In addition, it offers tutorials that explain the
+nature of vulnerabilities and how they can be eliminated.
+.PP
+By default, the behavior of
+.B SATAN
+is controlled by a configuration file
+.I (config/satan.cf).
+The defaults can be overruled via command-line options or via buttons
+etc.  in the HTML user interface.
+.PP
+Options:
+.IP -a
+Attack level (0=light, 1=normal, 2=heavy). At level 0,
+.B
+SATAN collects information about
+.I RPC
+services and from the
+.I DNS.
+At level 1,
+.B SATAN
+collects banners of well-known services such as
+.I telnet, smtp
+and
+.I ftp,
+and can usually establish the type of operating system.  At level 2,
+.B SATAN
+does a more extensive (but still non-intrusive) scan for services.
+Level 2 scans may result in console error messages.
+.IP "-A proximity_descent"
+While
+.B SATAN
+extracts information from primary targets, it may discover other
+hosts.  The
+.I proximity_descent
+controls by how much the
+.I attack level
+decreases when
+.B SATAN
+goes from primary targets to secondary ones, and so on. The
+.I -z
+option determines what happens when the
+.I attack level
+reaches zero.
+.IP "-c 'name=value; name=value...'"
+Change the value of arbitrary 
+.B SATAN
+variables. Example: 
+.sp
+.ti +3
+.DS
+-c 'dont_use_dns = 1; dont_use_nslookup = 1'.
+.DE
+.sp
+The
+.I -c
+option allows you to control configuration and other variables that do
+not have their own command-line option. The format is a list of
+name=value pairs separated by semicolons. Variable names have no dollar
+prefix, and values are not quoted. Whitespace within values is
+preserved.
+.IP "-d database"
+Specifies the name of the database to read from and to save to (default
+.IR satan_data).
+.sp
+When multiple 
+.B SATAN
+processes are run in parallel, each process should be given its
+own database (for example, one database per subnet of 256 hosts). Use
+the
+.I merge
+facility of the HTML user interface to merge data from different runs.
+.IP -i
+Ignore the contents of the database.
+.IP "-l proximity"
+Maximal proximity level. Primary targets have proximity 0, hosts
+discovered while scanning primaries have proximity level 1, and so on.
+.B SATAN
+ignores all hosts that exceed the maximal proximity level.
+.IP "-o only_attack_these"
+A list of domain names and/or network numbers of hosts that
+.B SATAN
+is permitted to scan. List elements are separated by whitespace or
+commas. Understands the * shell-like wildcard.
+.IP "-O dont_attack_these"
+A list of domain names and/or network numbers that
+.B SATAN
+should stay away from. The list has the same format as with the
+.I -o
+option.
+.IP -s
+Subnet expansion. For each primary target,
+.B SATAN
+finds all alive hosts in the target\'s subnet (a block of 256
+addresses).
+.IP "-S status_file"
+While collecting data,
+.B SATAN
+maintains a status file with the last action taken. The default status
+file is
+.I status_file.
+.IP "-t level"
+Timeout level (0 = short, 1 = medium, 2 = long) for each probe.
+.IP -u
+Specifies that
+.B SATAN
+is being run from an untrusted host. Access via, for example, the
+remote shell or network file system services, means that there is a
+security problem.
+.IP -U
+Opposite of the
+.I -u
+option.
+.B SATAN
+may be run from a possibly trusted host. Access via, for example, the
+remote shell or network file system services is not necessarily a
+problem.
+.IP -v
+Verbose mode.
+.B SATAN
+prints on the standard output what it is doing. This is useful for
+debugging purposes.
+.IP -V
+.B SATAN
+prints its version number and terminates.
+.IP -z
+When scanning non-primary hosts, continue with
+.I attack level
+of zero when the level would become negative. The scan continues until
+the maximal proximity level is reached.
+.IP -Z
+Opposite of the
+.I -z
+option.
+.SH FILES
+.I config/*
+configuration files
+.br
+.I rules/*
+rule bases
+.br
+.I results/*
+data bases
+.SH AUTHORS
+Dan Farmer, Wietse Venema

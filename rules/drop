@@ -1,0 +1,13 @@
+# 
+# Rules that determine what facts should be ignored. Each rule is applied once
+# for each 'a' SATAN fact. A rule is a PERL condition that has full access to
+# the $target..$text globals and to all functions.
+#
+# Empty lines and text after a "#" character are ignored. Long lines may
+# be broken with backslash-newline.
+# 
+
+#
+# Don't complain about /cdrom being exported to the world.
+#
+$text =~ /exports \/cdrom/i

@@ -1,0 +1,133 @@
+.TH fping l
+.SH NAME
+fping \- send ICMP ECHO_REQUEST packets to network hosts
+.SH SYNOPSIS
+.B fping
+[ \fIoptions\fR ]
+[ \fIsystems...\fR ]
+
+.SH DESCRIPTION
+.NXR "fping command"
+.NXR "ICMP ECHO_REQUEST"
+
+      
+.B fping 
+is a 
+.MS ping 8
+like program which uses the Internet Control
+Message Protocol (ICMP) echo request to determine if a host is
+up. 
+.B fping 
+is different from ping in that you can specify any
+number of hosts on the command line, or specify a file containing
+the lists of hosts to ping. Instead of trying one host until it
+timeouts or replies, 
+.B fping 
+will send out a ping packet and move
+on to the next host in a round-robin fashion. If a host replies,
+it is noted and removed from the list of hosts to check. If a host
+does not respond within a certain time limit and/or retry limit it 
+will be considered unreachable. 
+.PP
+Unlike 
+.MS ping 8
+,
+.B fping 
+is meant to be used in scripts and its output is easy to parse.
+.SH OPTIONS
+.IP \fB-a\fR 5
+Show systems that are alive.
+.IP \fB-d\fR 5
+Use DNS to lookup address of return ping packet. This allows you to give
+fping a list of IP addresses as input and print hostnames in the output.
+.IP \fB-e\fR 5
+Show elapsed (round-trip) time of packets
+.IP \fB-f\fR 5
+Read list of system from a file.
+.IP \fB-i\fIn\fR 5
+The minimum amount of time (in milliseconds) between sending a ping packet to any host (default is 25).
+.IP \fB-q\fR 5
+Quiet. Don't show per host results, just set final exit status.
+.IP \fB-r\fIn\fR 5
+Retry limit (default 3). This is the number of times an attempt at pinging
+a host will be made, not including the first try.
+.IP \fB-s\fR 5
+Dump final statistics.
+.IP \fB-t\fIn\fR 5
+Individual host timeout in milliseconds (default 2500). This is the 
+minimum number of milliseconds between ping packets directed towards a given
+host.
+.IP \fB-u\fR 5
+Show systems that are unreachable.
+.B fping
+a list of IP addresses as input and have the results printed as hostnames.
+.SH EXAMPLES
+The following perl script will check a list of hosts and send mail if
+any are unreachable. It uses the open2 function which allows a program
+to be opened for reading and writing. fping does not start pinging the
+list of systems until it reads EOF, which it gets after INPUT is closed. 
+Sure the open2 usage is not need in this example, but its a good open2
+example none the less. 
+.nf
+
+#!/usr/local/bin/perl
+require 'open2.pl';
+
+$MAILTO = "root";
+
+$pid = &open2("OUTPUT","INPUT","/usr/local/bin/fping -u");
+
+@check=("slapshot","foo","foobar");
+
+foreach(@check) {  print INPUT "$_\\n"; }
+close(INPUT);
+@output=<OUTPUT>;
+
+if ($#output != -1) {
+ chop($date=`date`);
+ open(MAIL,"|mail -s 'unreachable systems' $MAILTO");
+ print MAIL "\\nThe following systems are unreachable as of: $date\\n\\n";
+ print MAIL @output;
+ close MAIL;
+}
+
+.ni
+Another good example is when you want to perform an action only on hosts
+that are currently reachable.
+.nf
+
+#!/usr/local/bin/perl
+
+$hosts_to_backup = `cat /etc/hosts.backup | fping -a`;
+
+foreach $host (split(/\\n/,$hosts_to_backup)) {
+  # do it
+}
+
+.ni
+
+.SH AUTHOR
+Roland J. Schemers III, Stanford University
+.SH DIAGNOSTICS
+Exit status is 0 if all the hosts are reachable, 1 if some hosts were
+unreachable, 2 if any IP addresses were not found, 3 for invalid
+command line arguments, and 4 for a system call failure.
+.SH BUGS
+Ha! If there were any I knew of I would have fixed them!
+.SH RESTRICTIONS
+If certain options are used (i.e, a low value for -i and -t, and a 
+high value for -r) it is possible to flood the network. This program
+must be installed as setuid root in order to open up a raw socket,
+or must be run by root. In order to stop mere mortals from hosing the
+network (when fping is installed setuid root) , normal users can't specify 
+the following:
+.nf
+
+ -i n   where n < 10  msec
+ -r n   where n > 20
+ -t n   where n < 250 msec
+
+.ni
+.SH SEE ALSO
+netstat(1), ping(8), ifconfig(8c)
+

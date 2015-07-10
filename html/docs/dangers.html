@@ -1,0 +1,113 @@
+<HTML>
+<HEAD>
+<title>Dangers of SATAN</title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">Dangers of SATAN</H1>
+<HR>
+How could a friendly program such as SATAN be called dangerous?  Well,
+there are two reasons; first, system crackers, potential intruders, or
+simply random people on the Internet could run the program against hosts
+that they have no authorization to do so against.  This could be a
+problem especially since some of the probes that SATAN uses are very
+similar to some attack methods used by system crackers (and that's part
+of the reason that it works so well), and alarms and blood pressures
+could be raised unnecessarily.  The second reason is that even a
+well-intentioned system administrator could run SATAN on her or his
+system and it could follow lines of trust or potential vulnerability far
+beyond their authorized e-borders and anger or frustrate their
+neighbors.  The safest way to run SATAN is behind a firewall - since
+SATAN will only probe systems that it has IP connectivity to, it will
+never cross the firewall host (assuming IP_FORWARDING is turned off.)
+Be <STRONG>VERY</STRONG> careful if you're running SATAN behind a firewall
+that allows inside users to have direct IP connectivity to hosts on
+the Internet!  You are essentially on the Internet as far as SATAN
+is concerned, so follow the above guidelines.
+
+<p>
+The dangers of <I>writing</I> SATAN are tangible as well.  One
+of the authors lost his job because of it; there has been a letter
+writing campaign to stop the release of the program.  People accuse
+us of writing it for noterieties sake and pure personal gain.  And
+the newspaper reports of the mission of the program have not been, as
+they say, wholly favorable.
+
+<p>
+<A NAME="leashing-satan"><H3>Controlling SATAN</H3></A>
+SATAN has three main safeguards built into the program.  First, it will
+never venture further than the <I>proximity level</I> number of
+hosts away from the original target or subnet.  Each host or ring of
+hosts that is/are adjacent to the original target is one proximity level
+further away.  So if the proximity level is set to two, SATAN will never
+attack more than two hops away from the original target.  This can still
+be a very sizable number of hosts, because it can progress
+exponentially!  See the <A HREF="satan.cf.html#prox-vars">config/satan.cf</A>
+documentation for more on this topic.  In addition to proximity levels,
+it has two other methods to restrict SATAN's wanderings - the two
+targeting exception variables <I>"$only_attack_these"</I> and
+<I>"$dont_attack_these"</I>.  The first can limit SATAN to probe only
+hosts in a specified set of hosts, governed by their FQDN (such as
+<I>"berkeley.edu"</I>, <I>"sun.com"</I>, or whatever), and the second
+can inform SATAN that it shouldn't probe any hosts of a specific name -
+for instance, all military (<I>".mil"</I>) or government (<I>".gov"</I>)
+sites.  See the <A HREF="satan.cf.html#exceptions">config/satan.cf</A>
+documentation for more on this topic.
+<p>
+<A NAME="boundary"><H3>Boundary issues - keeping track of where it
+is</H3></A>
+When SATAN probes hosts, it updates a status file (called
+<i>status_file</i> by default) with a time stamp and with the last
+executed action.
+Setting the verbose/debug flag (the "-v" option) will output the
+current host on the command line, but with quite a bit of other output
+as well, and it can be difficult to keep track of things.
+<p>
+<A NAME="being-friendly"><H3>Being a very unfriendly neighbor</H3></A>
+It is generally considered to be very rude and anti-social behavior to
+scan someone else's hosts or networks without the explicit permission of
+the owner.  <STRONG>Always</STRONG> ask if it'd be ok to scan outside of
+your own networks.  If you're unsure about where SATAN will go, set the
+<A HREF="satan.cf.html#prox-vars">proximity levels</A> to be very low
+(start at zero!) and set the <A HREF="satan.cf.html#exceptions">
+$only_attack_these</A> variable to disallow SATAN from scanning anything
+but your own hosts.
+<p>
+Please be considerate <I>and</I> smart; unauthorized scanning of your
+Internet neighbors, even if you think you're doing them a favor, can be
+seen as a serious transgression on your part, and could engender not
+only ill will or bad feelings, but legal problems as well.
+<p>
+<A NAME="attack-or-not"><H3>Attacking vs. probing vs. scanning</H3></A>
+What is an attack, or a probe, or a scan?  It's not always clear,
+especially as system administrators are getting more savy and aware of
+the enormous amount of traffic present on the Internet (see Steve
+Bellovin's <A HREF="ftp://research.att.com/dist/smb/packets.ps">
+paper</A> on this topic for more information about this).  For instance,
+is a finger from a remote site an attack?  Without knowing any of the
+motivations involved, it can't be ascertained.  "Finger wars", or two
+sites that use the <I>"tcp wrappers"</I> or similar software that will
+automatically finger a remote site that connects to it can bring down
+hosts inadvertently.
+<p>
+Certainly SATAN could be used to attack systems, but just as certainly,
+it wasn't designed for that.  In the documentation we use scanning and
+probing fairly interchangeably, and as long as SATAN is used properly,
+that's all it will ever do.  Be aware that many of the probes will
+generate messages on the console or set off various alarms on the remote
+target, however, so you should be aware of the potential for false
+alarms and accusations that might be leveled against you.
+<p>
+<A NAME="legal"><H3>Legal problems with running SATAN</H3></A>
+Not only is it an unfriendly idea to run SATAN against a remote site
+without permission, it is probably illegal as well.  Do yourself and the
+rest of the Internet a favor and don't do it!  While we don't know of
+anyone being charged with a crime or sued because they ran a security
+tool against someone else, SATAN could change that.  Heed the warnings,
+limit your scans to authorized hosts, and all should be well.
+
+<hr>
+<a href="satan_overview.html"> Back to the Introductory TOC/Index</a>
+
+</BODY>
+</HTML>

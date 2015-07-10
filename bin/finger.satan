@@ -1,0 +1,96 @@
+#!/usr/local/bin/perl5
+#
+# version 2, Mon Mar 20 21:30:24 1995, last mod by wietse
+#
+
+# Query the target's finger daemon and report which user logged in from
+# which host.  Try to clean up unqualified host names or host names that
+# may be truncated. 
+
+$running_under_satan = 1;
+
+require 'config/paths.pl';
+require 'perl/fix_hostname.pl';
+require 'perl/misc.pl';
+require 'perllib/getopts.pl';
+ 
+#
+# Parse JCL.
+#
+$usage="Usage: $0 [-u user] [user@]target\n";
+$opt_u = ":0:\@:root:demo:guest";
+&Getopts("u:v");
+ 
+if ($#ARGV < 0) {
+    print STDERR $usage;
+    exit 1;
+}
+
+# If no user is given, iterate over a list of queries that might
+# give us some interesting answers.
+
+if ($ARGV[0] =~ /([^@]+)@([^@]+)/) {
+    $login = $1;
+    $target = $2;
+} else {
+    $target = $ARGV[0];
+    $login = $opt_u;
+}
+
+$| = 1;
+$service = &basename($0, ".satan");
+$severity = "l";
+
+foreach $user (split(/:/, $login)) {
+    print "trying: $SAFE_FINGER -l $user\@$target\n" if $opt_v;
+    open (FINGER, "$SAFE_FINGER -l $user\@$target 2>/dev/null|") 
+	|| exit 1;
+    while (<FINGER>) {
+	print if $opt_v;
+	if (/^ login name: (\S+)/i) { 
+	    $user = $1;
+	}
+	if (/^ login: (\S+)/i) { 
+	    $user = $1;
+	}
+	if (/^ directory: (\S+)/i) { 
+	    $home = $1;
+	}
+	if (/(on since|last login).*\s+from\s+(\S+)/i) { 
+	    # Get rid of sync, daemon, localhost, X displays
+	    next if ($user eq "sync" || $user eq "daemon");
+	    $origin = $2;
+	    $origin =~ s/:.*//;
+	    # Strip off X display numbers.
+	    if ($origin =~ /(.*)@(.*)/) {
+		($ruser = $1) || ($ruser = "root");
+		$host = $2;
+	    } else {
+		$ruser = "root";
+		$host = $origin;
+	    }
+	    next if ($host eq "" || $host eq "localhost");
+	    if ($fqdn = &fix_hostname($host, $target)) {
+		$host = $fqdn;
+		$status = "a";
+		$trustee = "$user\@$target";
+		$trusted = "$ruser\@$host";
+		$text = "login $user home $home from $host"
+	    } else {
+		$status = "u";
+		$trustee = "$user\@$target";
+		$trusted = "$user\@$host";
+		$text = "login $user home $home from $host, unable to verify hostname";
+	    }
+	    $service_output = "$user $home $host";
+	    &satan_print();
+	} elsif (/^ (never logged in|on since|last login)/i) { 
+	    $status = "a";
+	    $trustee = $trusted = "";
+	    $text = "login $user home $home";
+	    $service_output = "$user $home";
+	    &satan_print();
+	}
+    }
+    close(FINGER);
+}

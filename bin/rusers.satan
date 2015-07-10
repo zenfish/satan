@@ -1,0 +1,80 @@
+#!/usr/local/bin/perl5
+#
+# version 1, Mon Mar 20 18:49:25 1995, last mod by wietse
+#
+
+# Query the target's rusers daemon and report which user logged in from
+# which host.  Try to clean up unqualified host names or host names that
+# are truncated.
+
+$running_under_satan = 1;
+
+require 'config/paths.pl';
+require 'perl/fix_hostname.pl';
+require 'perl/misc.pl';
+require 'perllib/getopts.pl';
+
+#
+# Parse JCL.
+#
+$usage="Usage: rusers.satan target\n";
+&Getopts("v");
+ 
+if ($#ARGV < 0) {
+	print STDERR $usage;
+	exit 1;
+}
+$target = $ARGV[0];
+$service = &basename($0, ".satan");
+
+$| = 1;
+
+#
+# Examine the output from the rusers client.
+#
+open (RUSERS, "$RUSERS -l $target 2>/dev/null|") 
+    || exit 1;
+
+while (<RUSERS>) {
+    ($user, $where, $month, $day, $time, $idle, $host) = split;
+
+    # Deal with hostname stuff in case of remote logins.
+    if (/\(.*\)/) {
+	if ($idle && !$host) {
+	    $host = $idle;
+	}
+	# Get rid of X display numbers.
+	$host =~ s/:.*//;
+	$host =~ s/[()]//g;
+
+	# Verify hostname if anything interesting was left.
+	if ($host ne "" && $host ne "localhost") {
+	    # Canonicalize the host name.
+	    if ($fqdn = &fix_hostname($host, $target)) {
+		$host = $fqdn;
+		$status = "a";
+		$severity = "l";
+		$trustee = "$user\@$target";
+		$trusted = "root\@$host";
+		$service_output = "$user";
+		$text = "login $user from $host";
+		&satan_print();
+	    } else {
+		$status = "u";
+		$severity = "l";
+		$trustee = "$user\@$target";
+		$trusted = "root\@$host";
+		$service_output = "$user";
+		$text = "login $user from $host, unable to verify hostname";
+		&satan_print();
+	    }
+	}
+    }
+    # Log this user, whether or not remote.
+    $status = "a";
+    $severity = "l";
+    $text = "login $user";
+    $service_output = "$user";
+    $trusted = $trustee = "";
+    &satan_print();
+}

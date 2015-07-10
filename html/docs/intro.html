@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<title> Introduction</title>
+<LINK REV="made" HREF="mailto:satan@fish.com">
+</HEAD>
+<BODY>
+<H1><IMG SRC="../images/satan.gif" ALT="[SATAN IMAGE]">Introduction</H1>
+<HR>
+<P>
+<A NAME="what-is-satan"><H3>What is SATAN?</H3></a>
+<p>
+SATAN is the Security Analysis Tool for Auditing Networks.  In its
+simplest (and default) mode, it gathers as much information
+about remote hosts and networks as possible by examining such network
+services as finger, NFS, NIS, ftp and tftp, rexd, and other services.
+The information gathered includes the presence of various network
+information services as well as potential security flaws -- usually in
+the form of incorrectly setup or configured network services, well-known
+bugs in system or network utilities, or poor or ignorant policy
+decisions.  It can then either report on this data or use a simple
+rule-based system to investigate any potential security problems.
+Users can then examine, query, and analyze the output with an HTML
+browser, such as Mosaic, Netscape, or Lynx.  While the program is
+primarily geared towards analyzing the security implications of the
+results, a great deal of general network information can be gained when
+using the tool - network topology, network services running, types of
+hardware and software being used on the network, etc.
+<p>
+However, the real power of SATAN comes into play when used in
+exploratory mode.  Based on the initial data collection and a user
+configurable ruleset, it will examine the avenues of trust and
+dependency and iterate further data collection runs over secondary
+hosts.  This not only allows the user to analyze her or his own network
+or hosts, but also to examine the real implications inherent in network trust
+and services and help them make reasonably educated decisions about the
+security level of the systems involved.
+<p>
+<A NAME="who-should-use"><H3>Who should use SATAN?</H3></a>
+SATAN should prove to be most useful when used by the system or security
+administrators who own or are responsible for the security of the
+systems involved.  However, since it is freely available and will
+probably see widespread use throughout the Internet community, it should
+be used by anyone who is concerned about the security of their systems,
+since potential intruders will be able to access the same security
+vulnerability information and since it is quite likely that it will
+uncover security problems that were previously unknown.
+<p>
+<A NAME="how-does-it-work"><H3>How does it work?</H3></a>
+SATAN has a target acquisition program that uses <I>fping</I> to
+determine whether or not a host or set of hosts in a subnet are alive.
+It then passes this target list to an engine that drives the data
+collection and the main feedback loop.  Each host is examined to see if
+it has been seen before, and, if not, a list of tests/probes is run
+against it (the set of tests depends on the distance the host is from
+the initial target and what probe level has been set.)  The tests emit a
+data record that has the hostname, the test run, and any results found
+from the probe; this data is saved in files for analysis.  The user
+interface uses HTML to link the often vast amounts of data to more
+coherent and palatable results that the user can readily digest and
+understand.
+
+<hr>
+<a href="satan_overview.html"> Back to the Introductory TOC/Index</a>
+</BODY>
+</HTML>
